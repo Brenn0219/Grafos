@@ -14,3 +14,8 @@ Essa estrutura cria uma matriz de y colunas e x linhas, nos dois arquivos usados
 
 ### Grau dos Vertices
 A consulta dos graus dos maiores vertices é feita utilizando dois for encadeados, complexidade O(n²), que um contador soma todas as relações do vértice i e compara. Isso é feita tanto para o sucessor e predecessor trocando a ordem de execução entre linha e coluna.
+
+## Referência 
+* https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/graphdatastructs.html
+
+*Obs*: Preferi optar por desenvolver meus próprios métodos para solucionar esse trabalho. Essa referência é mais para complemento de aprendizagem.
