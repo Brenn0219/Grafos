@@ -1,21 +1,18 @@
 
-# Matriz Adjacente
-A estrutura utilizada nesse trabalho prático foi a Matrix Adjancente na linguagem de programação Java. 
+# Lista Adjacente
+A estrutura utilizada nesse trabalho prático foi a Lista Adjancente na linguagem de programação C. 
 
 ## Propriedades
-* É uma matriz booleana com colunas e linhas indexadas pelos vértices
+* Um grafo G pode ser representado por diferentes listas de adjacência pois os
+elementos podem aparecer em qualquer ordem nas listas
 
-* Consulta eficiênte à existência de arco incidente a um vértice em tempo constante O(1).
+* A consulta é mais cara para se determinar a existência de arco incidente a um
+vértice – tempo linear no número de vértices, isto é, O(n) para grafo denso
 
-* Ocupa um espaço proporcional a O(n²)
+* Ela ocupa um espaço proporcional a O(n + m)
 
 ## Descrição
-Essa estrutura cria uma matriz de y colunas e x linhas, nos dois arquivos usados de base a matriz fica com espaço de 100x100 e 50000x50000. 
-
-### Grau dos Vertices
-A consulta dos graus dos maiores vertices é feita utilizando dois for encadeados, complexidade O(n²), que um contador soma todas as relações do vértice i e compara. Isso é feita tanto para o sucessor e predecessor trocando a ordem de execução entre linha e coluna.
+O `vetor de listas de adjacência` de um grafo tem uma **lista encadeada** (= *linked list*) associada com cada vértice do grafo.  A lista associada com um vértice v contém todos os vizinhos de v.  Portanto, a lista do vértice v representa o leque de saída de v. 
 
 ## Referência 
 * https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/graphdatastructs.html
-
-*Obs*: Preferi optar por desenvolver meus próprios métodos para solucionar esse trabalho. Essa referência é mais para complemento de aprendizagem.
