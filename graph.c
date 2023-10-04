@@ -292,7 +292,9 @@ void searchVertex(int vertex, graph graph, talble talble) {
     printf("=============================================\n");
 
     for(int i = 0; i < n; i++) {
-        if(talble.endTime[vertex] < talble.endTime[set[i]] && talble.descoveryTime[vertex] > talble.descoveryTime[set[i]]) {
+        if (vertex == talble.father[set[i]]) {
+            printf("{%d, %d} - arvore\n", vertex, set[i]);
+        } else if(talble.endTime[vertex] < talble.endTime[set[i]] && talble.descoveryTime[vertex] > talble.descoveryTime[set[i]]) {
             printf("{%d, %d} - retorno\n", vertex, set[i]);
         } else if (talble.descoveryTime[vertex] < talble.descoveryTime[set[i]]) {
             printf("{%d, %d} - avanco\n", vertex, set[i]);
