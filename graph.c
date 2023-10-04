@@ -71,13 +71,75 @@ void buildGraph(graph graph, FILE *file) {
     }
 }
 
+int s_vertexDegree(graph graph, int vertex) {
+    node *i = graph.adjacent[vertex]->next;
+    int counter = 0;
+
+    while (i != NULL) {
+        counter++;
+        i = i->next;
+    }
+    
+    return counter;
+}
+
+int p_vertexDegree(graph graph, int vertex) {
+    int n = graph.vertex + 1, counter = 0;
+
+    for(int i = 1; i < n; i++) {
+        if (i != vertex) {
+            node *j = graph.adjacent[i]->next;
+
+            while (j != NULL) {
+                if(j->vertex == vertex) {
+                    counter++;
+                }
+
+                j = j->next;
+            }
+        }
+    }
+
+    return counter;
+}
+
+int highestDegreeVertex(graph directedGraph, char derection, int *vertex) {
+    int (*degree)(graph, int); // ponteiro par uma funcao
+    
+    switch (derection) {
+        case 'p':
+            degree = p_vertexDegree;
+            break;
+        case 's':
+            degree = s_vertexDegree;
+            break;
+        default:
+            break;
+    }
+
+    int n = directedGraph.vertex + 1, highestDegree = 0, x = 0;
+
+    for(int i = 1; i < n; i++) {
+        x = degree(directedGraph, directedGraph.adjacent[i]->vertex);
+
+        if(highestDegree < x) {
+            highestDegree = x;
+            *vertex = i;
+        }
+    }
+
+    return highestDegree;
+}
+
 int main() {
     FILE *file = fopen("graph-test-100.txt", "r");
 
     graph graph = initializeGraph(file);
     buildGraph(graph, file);
 
-    node *i = graph.adjacent[1];
+    int vertex, degree;
+    degree = highestDegreeVertex(graph, 'p', &vertex);
+    printf("vertex: %d degree: %d\n", vertex, degree);
    
     fclose(file);
     return 0;
