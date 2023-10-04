@@ -71,6 +71,7 @@ void buildGraph(graph graph, FILE *file) {
     }
 }
 
+// grau dos vertices sucessores
 int s_vertexDegree(graph graph, int vertex) {
     node *i = graph.adjacent[vertex]->next;
     int counter = 0;
@@ -83,6 +84,7 @@ int s_vertexDegree(graph graph, int vertex) {
     return counter;
 }
 
+// grau dos vertices predecessores
 int p_vertexDegree(graph graph, int vertex) {
     int n = graph.vertex + 1, counter = 0;
 
@@ -103,6 +105,7 @@ int p_vertexDegree(graph graph, int vertex) {
     return counter;
 }
 
+// maior grau entre os vertices
 int highestDegreeVertex(graph directedGraph, char derection, int *vertex) {
     int (*degree)(graph, int); // ponteiro par uma funcao
     
@@ -131,6 +134,60 @@ int highestDegreeVertex(graph directedGraph, char derection, int *vertex) {
     return highestDegree;
 }
 
+void s_verttexSet(graph graph, int vertex) {
+    node *i = graph.adjacent[vertex]->next;
+
+    printf("sucessors = {");
+    while (i != NULL) {
+        if(i->next != NULL) {
+            printf("%d - ", i->vertex);
+        } else {
+            printf("%d}\n", i->vertex);
+        }
+
+        i = i->next;
+    }
+}
+
+void p_vertexSet(graph graph, int vertex) {
+    int n = graph.vertex + 1;
+
+    printf("predecessors = {");
+    for(int i = 1; i < n; i++) {
+        if(i != vertex) {
+            node *j = graph.adjacent[i]->next;
+
+            while (j != NULL) {
+                if(j->vertex == vertex) {
+                    printf("%d - ", i);
+                    break;
+                }
+
+                j = j->next;
+            }
+            
+        }
+    }
+    printf("}\n");
+}
+
+void printVertexSet(graph directedGraph, int vertex, char derection) {
+    void (*print)(graph, int);
+
+    switch (derection) {
+        case 'p':
+            print = p_vertexSet;
+            break;
+        case 's':
+            print = s_verttexSet;
+            break;
+        default:
+            break;
+    }
+
+    print(directedGraph, vertex);
+}
+
 int main() {
     FILE *file = fopen("graph-test-100.txt", "r");
 
@@ -138,8 +195,11 @@ int main() {
     buildGraph(graph, file);
 
     int vertex, degree;
-    degree = highestDegreeVertex(graph, 'p', &vertex);
+    char direction = 'p';
+
+    degree = highestDegreeVertex(graph, direction, &vertex);
     printf("vertex: %d degree: %d\n", vertex, degree);
+    printVertexSet(graph, vertex, direction);
    
     fclose(file);
     return 0;
