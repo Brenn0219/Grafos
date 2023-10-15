@@ -1,8 +1,8 @@
 #include "../include/graph.h"
 
 // print do conjunto dos sucessores de um veritice
-void print_successors_set(graph graph, int vertex) {
-    node *i = graph.adjacent[vertex]->next;
+void print_successors_set(Graph graph, int vertex) {
+    Node *i = graph.adjacent[vertex]->next;
 
     printf("sucessors = {");
     while (i != NULL) {
@@ -17,13 +17,13 @@ void print_successors_set(graph graph, int vertex) {
 }
 
 // print do conjunto dos predecessores de um veritice
-void print_predecessor_set(graph graph, int vertex) {
+void print_predecessor_set(Graph graph, int vertex) {
     int n = graph.vertex + 1;
 
     printf("predecessors = {");
     for(int i = 1; i < n; i++) {
         if(i != vertex) {
-            node *j = graph.adjacent[i]->next;
+            Node *j = graph.adjacent[i]->next;
 
             while (j != NULL) {
                 if(j->vertex == vertex) {
@@ -40,8 +40,8 @@ void print_predecessor_set(graph graph, int vertex) {
 }
 
 // print do conjunto de uma das "direcoes"
-void print_vertex_set(graph directedGraph, int vertex, char derection) {
-    void (*print)(graph, int);
+void print_vertex_set(Graph directedGraph, int vertex, char derection) {
+    void (*print)(Graph, int);
 
     switch (derection) {
         case 'p':
@@ -58,7 +58,7 @@ void print_vertex_set(graph directedGraph, int vertex, char derection) {
 }
 
 // classificacao das arestas de um vertice especifico
-void print_edge_classification(int vertex, graph graph, table table) {
+void print_edge_classification(int vertex, Graph graph, table table) {
     int n = set_size(graph.adjacent[vertex]);
     int set[n];
 

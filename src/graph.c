@@ -3,8 +3,8 @@
 #include "../include/graph.h"
 
 // instanciando um novo no
-node* new_node(int x) {
-    node *node = malloc(sizeof(struct node));
+Node* new_node(int x) {
+    Node *node = malloc(sizeof(Node));
     node->vertex = x;
     node->next = NULL;
 
@@ -12,8 +12,8 @@ node* new_node(int x) {
 }
 
 // inserindo as relacoes dos vertices - arestas
-void insert_edge(graph *graph, int v, int w) {
-    node *i = graph->adjacent[v];
+void insert_edge(Graph *graph, int v, int w) {
+    Node *i = graph->adjacent[v];
        
     while (i != NULL) {
         if(i->vertex == w) 
@@ -30,7 +30,7 @@ void insert_edge(graph *graph, int v, int w) {
 }
 
 // construindo o grafico
-void build_graph(graph *graph, char *path) {
+void build_graph(Graph *graph, char *path) {
     FILE *file = fopen(path, "r");
 
     if (file == NULL) {
@@ -46,7 +46,7 @@ void build_graph(graph *graph, char *path) {
     graph->adjacent = malloc(sizeof(link) * (vertex + 1));
     
     for(int i = 1; i < vertex + 1; i++) {
-        graph->adjacent[i] = malloc(sizeof(struct node));
+        graph->adjacent[i] = malloc(sizeof(Node));
         graph->adjacent[i]->vertex = i;
         graph->adjacent[i]->next = NULL;  
     }
@@ -59,8 +59,8 @@ void build_graph(graph *graph, char *path) {
 }
 
 // grau dos vertices sucessores
-int degree_vertex_sucessor_set(graph graph, int vertex) {
-    node *i = graph.adjacent[vertex]->next;
+int degree_vertex_sucessor_set(Graph graph, int vertex) {
+    Node *i = graph.adjacent[vertex]->next;
     int counter = 0;
 
     while (i != NULL) {
@@ -72,12 +72,12 @@ int degree_vertex_sucessor_set(graph graph, int vertex) {
 }
 
 // grau dos vertices predecessores
-int degree_vertex_predecessor_set(graph graph, int vertex) {
+int degree_vertex_predecessor_set(Graph graph, int vertex) {
     int n = graph.vertex + 1, counter = 0;
 
     for(int i = 1; i < n; i++) {
         if (i != vertex) {
-            node *j = graph.adjacent[i]->next;
+            Node *j = graph.adjacent[i]->next;
 
             while (j != NULL) {
                 if(j->vertex == vertex) {
@@ -93,8 +93,8 @@ int degree_vertex_predecessor_set(graph graph, int vertex) {
 }
 
 // maior grau entre os vertices
-int highest_degree_vertex(graph directedGraph, char derection, int *vertex) {
-    int (*degree)(graph, int); // ponteiro par uma funcao
+int highest_degree_vertex(Graph directedGraph, char derection, int *vertex) {
+    int (*degree)(Graph, int); // ponteiro par uma funcao
     
     switch (derection) {
         case 'p':
@@ -135,18 +135,17 @@ void ordering(int set[], int n) {
 }
 
 // retorna o numero de sucessores de um conjunto
-int set_size(node *n) {
+int set_size(Node *n) {
     int counter = 0;
 
-    for(node *i = n->next; i != NULL; i = i->next) {
+    for(Node *i = n->next; i != NULL; i = i->next)
         counter++;
-    }
     
     return counter;
 }
 
 // criando o conjunto de sucessores de um determinado vertice
-void lexographic_set(int set[], node *node, int n) {
+void lexographic_set(int set[], Node *node, int n) {
     for(int i = 0; i < n; i++) {
         set[i] = node->vertex;
         node = node->next;
@@ -154,7 +153,7 @@ void lexographic_set(int set[], node *node, int n) {
 }
 
 // busca em profundidade 
-void depeth_search(graph graph, table table, int vertex, int *lifetime) {
+void depeth_search(Graph graph, table table, int vertex, int *lifetime) {
     int n = set_size(graph.adjacent[vertex]);
     int set[n];
     
@@ -175,7 +174,7 @@ void depeth_search(graph graph, table table, int vertex, int *lifetime) {
 }
 
 // inicializacao da busca em profundidade
-table dfs(graph graph) {
+table dfs(Graph graph) {
     int n = graph.vertex + 1, lifetime = 0;
     table table;
 

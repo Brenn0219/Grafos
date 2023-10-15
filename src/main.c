@@ -3,7 +3,7 @@
 #include "../include/print_graph.h"
 
 int main() {
-    graph graph;
+    Graph graph;
     table table;
     char *path = "data/graph-test-100.txt";
 
