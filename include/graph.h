@@ -1,34 +1,37 @@
 #pragma once
 #include <stdio.h>
+#include "list.h"
 
-// estrutura de no da lista
-typedef struct Node {
-    int vertex;
-    struct Node *next;
-} Node;
+/// @brief Ponteiro para a estrutura de dado Lista
+typedef struct List *Link;
 
-// ponteiro para a estrutura de dados node
-typedef struct Node *link; 
-
-// grafos
+/// @brief Estrutura de dado de grafos. O atributo vcount e o total de vertices do grafo, ecount o total de arestas do grafo e adjacent e uma lista encadeada correspondendo a cada vertice
 typedef struct Graph {
-    int vertex; 
-    int edge;
-    link *adjacent;
+    int vcount; 
+    int ecount;
+    Link *adjacent;
 } Graph;
 
-// instanciando um novo no
-Node* new_node(int x);
-// inserindo as relacoes dos vertices - arestas
-void insert_edge(Graph *graph, int v, int w);
-// construindo o grafico
-void build_graph(Graph *graph, char *path);
-// grau dos vertices sucessores
-int degree_vertex_sucessor_set(Graph graph, int vertex);
+/// @brief Insere uma aresta em um grafo
+/// @param graph ponteiro para um grafo 
+/// @param v vertice fonte
+/// @param w vertice sucessor - destino
+/// @return 1 se aresta (v, w) ja foi inserida; 0 aresta inserida com sucesso; -1 caso algo de errado
+int graph_edge_insertion(Graph *graph, int v, int w);
+
+/// @brief Construi um grafico a partir de um arquivo. Instancia todas os vertices e insere as arestas fornecidas no arquivo
+/// @param graph ponteiro para grafo
+/// @param path caminho para abertura do arquivo
+/// @return 0 grafico construido com sucesso; -1 se nao encontrar o arquivo de abertura 
+int graph_build(Graph *graph, char *path);
+
+/// @brief Inicializacao de um grafo define atributos vcount e ecount para 0, e inicializa a estruta da lista 
+/// @param graph ponteiro para um grafo
+/// @param n total de vertices do grafo de inicio
+void graph_init(Graph *graph, int n);
+
 // grau dos vertices predecessores
 int degree_vertex_predecessor_set(Graph graph, int vertex);
-// maior grau entre os vertices
-int highest_degree_vertex(Graph directedGraph, char derection, int *vertex);
 
 // estrutura de tabela da dfs
 typedef struct table {
@@ -37,12 +40,6 @@ typedef struct table {
     int *father;
 } table;
 
-// ordenacao do conjunto de sucessores de um determinado vertice - select
-void ordering(int set[], int n);
-// retorna o numero de sucessores de um conjunto
-int set_size(Node *n);
-// criando o conjunto de sucessores de um determinado vertice
-void lexographic_set(int set[], Node *node, int n);
 // busca em profundidade 
 void depeth_search(Graph graph, table table, int vertex, int *lifetime);
 // inicializacao da busca em profundidade

@@ -2,88 +2,64 @@
 #include <stdlib.h>
 #include "../include/graph.h"
 
-// instanciando um novo no
-Node* new_node(int x) {
-    Node *node = malloc(sizeof(Node));
-    node->vertex = x;
-    node->next = NULL;
+int graph_edge_insertion(Graph *graph, int v, int w) {
+    if(list_search(graph->adjacent[v], w))
+        return 1;
 
-    return node;
-}
-
-// inserindo as relacoes dos vertices - arestas
-void insert_edge(Graph *graph, int v, int w) {
-    Node *i = graph->adjacent[v];
-       
-    while (i != NULL) {
-        if(i->vertex == w) 
-            return;
-
-        if(i->next == NULL) 
-            break;
-        else 
-            i = i->next;
+    if(list_insert(graph->adjacent[v], NULL, w) == 0) {
+        graph->ecount++;
+        return 0;
     }
-    
-    i->next = new_node(w);
-    graph->edge++;
+        
+    return -1;
 }
 
-// construindo o grafico
-void build_graph(Graph *graph, char *path) {
+int graph_build(Graph *graph, char *path) {
     FILE *file = fopen(path, "r");
+    int t_vertex, t_edge, v, w;
 
     if (file == NULL) {
         perror("Erro ao abrir o arquivo");
-        return;
+        return -1;
     }
 
-    int vertex, edge, v, w;
-    fscanf(file, "%d %d", &vertex, &edge);
-    
-    graph->vertex = vertex;
-    graph->edge = 0;
-    graph->adjacent = malloc(sizeof(link) * (vertex + 1));
-    
-    for(int i = 1; i < vertex + 1; i++) {
-        graph->adjacent[i] = malloc(sizeof(Node));
-        graph->adjacent[i]->vertex = i;
-        graph->adjacent[i]->next = NULL;  
-    }
-    
-    while (fscanf(file, "%d %d", &v, &w) != EOF) {
-        insert_edge(graph, v, w);  
-    }
+    fscanf(file, "%d %d", &t_vertex, &t_edge);
+    graph_init(graph, t_vertex);
+
+    for(int i = 0; i < t_edge; i++) {
+        if(fscanf(file, "%d %d", &v, &w) != EOF) 
+            graph_edge_insertion(graph, v, w);
+        else
+            i = t_edge;
+    }         
 
     fclose(file);
+    return 0;
 }
 
-// grau dos vertices sucessores
-int degree_vertex_sucessor_set(Graph graph, int vertex) {
-    Node *i = graph.adjacent[vertex]->next;
-    int counter = 0;
-
-    while (i != NULL) {
-        counter++;
-        i = i->next;
-    }
+void graph_init(Graph *graph, int n) {
+    graph->vcount = ++n;
+    graph->ecount = 0;
+    graph->adjacent = (Link *) malloc(sizeof(Link) * n);
     
-    return counter;
+    for(int i = 1; i < n; i++) {
+        graph->adjacent[i] = (List *) malloc(sizeof(List));
+        list_init(graph->adjacent[i]);
+    }         
 }
+
 
 // grau dos vertices predecessores
 int degree_vertex_predecessor_set(Graph graph, int vertex) {
-    int n = graph.vertex + 1, counter = 0;
+    int n = graph.vcount + 1, counter = 0;
 
     for(int i = 1; i < n; i++) {
         if (i != vertex) {
-            Node *j = graph.adjacent[i]->next;
+            Cell *j = list_head(graph.adjacent[i]);
 
             while (j != NULL) {
-                if(j->vertex == vertex) {
+                if(j->data == vertex)
                     counter++;
-                }
-
                 j = j->next;
             }
         }
@@ -93,7 +69,7 @@ int degree_vertex_predecessor_set(Graph graph, int vertex) {
 }
 
 // maior grau entre os vertices
-int highest_degree_vertex(Graph directedGraph, char derection, int *vertex) {
+int highest_degree(Graph graph, char derection, int *vertex) {
     int (*degree)(Graph, int); // ponteiro par uma funcao
     
     switch (derection) {
@@ -121,47 +97,18 @@ int highest_degree_vertex(Graph directedGraph, char derection, int *vertex) {
     return highestDegree;
 }
 
-// ordenacao do conjunto de sucessores de um determinado vertice - select
-void ordering(int set[], int n) {
-    for(int i = 0; i < n-1; i++) {
-        for(int j = i + 1; j < n; j++) {
-            if(set[j] < set[i]) {
-                int temp = set[j];
-                set[j] = set[i];
-                set[i] = temp;
-            }
-        }
-    }
-}
-
-// retorna o numero de sucessores de um conjunto
-int set_size(Node *n) {
-    int counter = 0;
-
-    for(Node *i = n->next; i != NULL; i = i->next)
-        counter++;
-    
-    return counter;
-}
-
-// criando o conjunto de sucessores de um determinado vertice
-void lexographic_set(int set[], Node *node, int n) {
-    for(int i = 0; i < n; i++) {
-        set[i] = node->vertex;
-        node = node->next;
-    }
-}
-
 // busca em profundidade 
 void depeth_search(Graph graph, table table, int vertex, int *lifetime) {
-    int n = set_size(graph.adjacent[vertex]);
+    int n = list_size(graph.adjacent[vertex]), counter = 0;
     int set[n];
-    
-    lexographic_set(set, graph.adjacent[vertex]->next, n);
+
+    for(Cell *i = list_head(graph.adjacent[vertex]); i != NULL; i = list_next(i)) 
+        set[counter++] = i->data;
+
     ordering(set, n);
 
     table.descoveryTime[vertex] = ++*lifetime;
-    
+
     for(int i = 0; i < n; i++) {
         if(table.descoveryTime[set[i]] == 0) {
             table.father[set[i]] = vertex;
@@ -169,25 +116,25 @@ void depeth_search(Graph graph, table table, int vertex, int *lifetime) {
             depeth_search(graph, table, set[i], lifetime);
         } 
     }
-    
+
     table.endTime[vertex] = ++*lifetime;
 }
 
 // inicializacao da busca em profundidade
 table dfs(Graph graph) {
-    int n = graph.vertex + 1, lifetime = 0;
+    int n = graph.vcount + 1, lifetime = 0;
     table table;
 
     table.descoveryTime = (int *) malloc(sizeof(int) * n);
     table.endTime = (int *) malloc(sizeof(int) * n);
     table.father = (int *) malloc(sizeof(int) * n);
-    
+
     for(int i = 1; i < n; i++) {
         table.descoveryTime[i] = 0;
         table.endTime[i] = 0;
         table.father[i] = -1;
     }
-    
+
     depeth_search(graph, table, 1, &lifetime);
 
     return table;
