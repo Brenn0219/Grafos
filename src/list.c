@@ -74,11 +74,26 @@ int list_insert(List *list, Cell* element, int data) {
     return 0;
 }
 
-int list_search(List *list, int data) {
+Cell* list_search(List *list, int data) {
     for(Cell *i = list_head(list); i != NULL; i = list_next(i)) {
         if(i->data == data) 
-            return 0;
+            return i;
     }
 
-    return -1;
+    return NULL;
+}
+
+void list_sort(List *list) {
+    Cell *j, *small;
+
+    for(Cell *i = list_head(list); i->next != NULL ; i = list_next(i)) {
+        for(Cell *j = i->next; j != NULL; j = list_next(j)) {
+            if (i->data > j->data)
+                small = j;
+        }
+
+        int temp = i->data;
+        i->data = small->data;
+        small->data = temp;
+    }    
 }

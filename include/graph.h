@@ -25,22 +25,7 @@ int graph_edge_insertion(Graph *graph, int v, int w);
 /// @return 0 grafico construido com sucesso; -1 se nao encontrar o arquivo de abertura 
 int graph_build(Graph *graph, char *path);
 
-/// @brief Inicializacao de um grafo define atributos vcount e ecount para 0, e inicializa a estruta da lista 
+/// @brief Inicializacao de um grafo. Define atributos vcount e ecount para 0, e inicializa a estruta da lista 
 /// @param graph ponteiro para um grafo
 /// @param n total de vertices do grafo de inicio
 void graph_init(Graph *graph, int n);
-
-// grau dos vertices predecessores
-int degree_vertex_predecessor_set(Graph graph, int vertex);
-
-// estrutura de tabela da dfs
-typedef struct table {
-    int *descoveryTime;
-    int *endTime;
-    int *father;
-} table;
-
-// busca em profundidade 
-void depeth_search(Graph graph, table table, int vertex, int *lifetime);
-// inicializacao da busca em profundidade
-table dfs(Graph graph);

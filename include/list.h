@@ -6,7 +6,7 @@ typedef struct Cell {
     struct Cell *next; 
 } Cell;
 
-/// @brief Estrutura de dado Lista Encadeada. A estrutra de Lista Encadead consistem em numero de elementos agrupados ou encadeados em uma ordem especifica.  
+/// @brief Estrutura de dado Lista Encadeada. A estrutra de Lista Encadeada consistem em numero de elementos agrupados ou encadeados em uma ordem especifica. O atributo size consiste no total de elemento da lista, head e tail são o cabecalho e o final  
 typedef struct List {
     int size;
     Cell *head;
@@ -19,11 +19,11 @@ void list_init(List *list);
 
 /// @brief Remove um elemento da lista encadeada
 /// @param list ponteiro para uma lista encadeada
-/// @param element elemnto que corresponde uma posicao anterior do elemento que ira ser removido
+/// @param element elemento que corresponde uma posicao anterior do elemento que ira ser removido
 /// @return -1 caso lista for vazia; 0 caso o elemento for removido
 int list_remove(List *list, Cell *element);
 
-/// @brief Desalocando uma lista encadeada da memoria
+/// @brief Desalocando uma lista encadeada da memoria. Utiliza o free em cada celula da lista
 /// @param list ponteiro para uma lista encadeada
 /// @return 0 caso lista seja destruida; -1 caso nao de para remover alguma aresta
 int list_destroy(List *list);
@@ -38,10 +38,15 @@ int list_insert(List *list, Cell *element, int data);
 /// @brief Pesquisa um elemento na lista encadeada
 /// @param list pointer para uma lista encadeada
 /// @param data corresponde o dado que vamos armazenar
-/// @return -1 caso o elemento nao for encontrado; 0 caso o elemento for encontrado
-int list_search(List *list, int data);
+/// @return NULL caso o elemento nao for encontrado; retorne a celula caso o elemento for encontrado
+Cell* list_search(List *list, int data);
  
+/// @brief Ordena a lista em cadeada. Utiliza a ordenacao de Selecao O(n²). * Futura Melhoria *
+/// @param list ponteiro para uma lista encadeada 
+void list_sort(List *list);
+
 #define list_size(list) ((list)->size)
 #define list_head(list) ((list)->head)
 #define list_tail(list) ((list)->tail)
+#define list_data(element) ((element)->data)
 #define list_next(element) ((element)->next)
