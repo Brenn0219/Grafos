@@ -25,5 +25,3 @@ clean:
 	rm -f $(TARGET) $(OBJECTS)
 
 .PHONY: all clean copy_data
-
-
