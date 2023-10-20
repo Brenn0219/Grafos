@@ -24,3 +24,6 @@ O algoritmo de busca é qualquer algoritmo que visita todos os vértices de um g
 
 ## Referência 
 * https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/graphdatastructs.html
+* https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/dfs.html
+* https://www.ic.unicamp.br/~zanoni/teaching/mo417/2011-2s/aulas/handout/10-grafos-buscas.pdf
+* https://everythingcomputerscience.com/books/Mastering-Algorithms-with-C-Loudon.pdf
