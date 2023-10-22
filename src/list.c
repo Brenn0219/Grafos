@@ -1,9 +1,11 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <memory.h>
 #include "../include/list.h"
 
-void list_init(List *list, void (* destroy) (void *data)) {
+void list_init(List *list, size_t structure_size, void (* destroy) (void *data)) {
     list->size = 0;
+    list->structure_size = structure_size;
     list->destroy = destroy;
     list->head = NULL;
     list->tail = NULL;
@@ -13,21 +15,31 @@ void list_destroy(List *list) {
     void *data;
 
     while (list_size(list) > 0) {
-        if (list_remove(list, NULL, (void **) &data) == 0 && list->destroy != NULL)
-            list->destroy(data);
+        if (list_remove(list, NULL) == -1)
+            return;
     }
 
     memset(list, 0, sizeof(List));
 }
 
-int list_insert(List *list, Cell *element, const void *data) {
-    Cell *new_element;
+Cell* list_new_cell(const void *data, size_t structure_size) {
+    Cell *new_cell = (Cell *) malloc(sizeof(Cell));
+    if (new_cell == NULL)
+        return NULL;    
 
-    if ((new_element = (Cell *) malloc(sizeof(Cell))) == NULL)
+    new_cell->next = NULL;
+    new_cell->data = (void *) malloc(structure_size); 
+    memcpy(new_cell->data, data, structure_size);
+    
+    return new_cell;   
+}
+
+int list_insert(List *list, Cell *element, const void *data) {
+    Cell *new_element = list_new_cell(data, list_structure_size(list));
+
+    if (new_element == NULL)
         return -1;
     
-    new_element->data = (void *) data;
-
     if (element == NULL) {
         if (list_size(list) == 0) 
             list->tail = new_element;
@@ -47,14 +59,13 @@ int list_insert(List *list, Cell *element, const void *data) {
     return 0;
 }
 
-int list_remove(List *list, Cell *element, void **data) {
+int list_remove(List *list, Cell *element) {
     Cell *old_element;
 
     if (list_size(list) == 0)
         return -1;
     
     if (element == NULL) {
-        *data = list->head->data;
         old_element = list->head;
         list->head = list->head->next;
 
@@ -64,7 +75,6 @@ int list_remove(List *list, Cell *element, void **data) {
         if (element->next == NULL)
             return -1;
 
-        *data = element->next->data;
         old_element = element->next;
         element->next = element->next->next;
 
@@ -72,15 +82,18 @@ int list_remove(List *list, Cell *element, void **data) {
             list->tail = element;
     }
 
+    if (list->destroy != NULL)
+        list->destroy(old_element->data); 
+
     free(old_element);
     list->size--;
 
     return 0;
 }
 
-Cell* list_search(List *list, int data) {
+Cell* list_search(List *list, const void *data) {
     for(Cell *i = list_head(list); i != NULL; i = list_next(i)) {
-        if((int) list_data(i) == data) 
+        if(!memcmp(data, list_data(i), list_structure_size(list))) 
             return i;
     }
 
