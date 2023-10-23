@@ -145,6 +145,29 @@ int graph_remove_vertex(Graph *graph, void *data) {
     free(element->data);
     free(element);
 
+    for(Cell *i = list_head(graph->adjlists); i != NULL; i = list_next(i)) {
+        List *list = ((AdjList *) list_data(i))->adjacent;
+        Cell *j = list_head(list);
+
+        if (!graph->match(data, j->data, list_structure_size(list))) {
+            while (j != NULL) {
+                if (j->next != NULL && graph->match(data, j->next->data, list_structure_size(list))) {
+                    if ((list_remove(list, j)) == -1) 
+                        return 1;
+
+                    break;
+                }
+
+                j = list_next(j);
+            }
+            
+        } else {
+            if ((list_remove(list, NULL)) == -1)
+                return -1;
+        }
+            
+    }
+
     return 0;
 }
 
