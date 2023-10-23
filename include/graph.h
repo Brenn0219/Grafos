@@ -55,12 +55,12 @@ int graph_insert_edge(Graph *graph, const void *data1, const void *data2);
 /// @return 0 se a inserção da aresta for bem-sucedida, 1 se a aresta já existir ou -1 caso contrário.
 int graph_remove_vertex(Graph *graph, void *data);
 
-/// @brief Remove a borda de data1 para data2 no gráfico especificado por graph . No retorno, data2 aponta para os dados armazenados na lista de adjacências do vértice especificado por data1 . É responsabilidade de o chamador para gerenciar o armazenamento associado aos dados.
+/// @brief Remove a borda de v para w no gráfico especificado por graph . No retorno, w aponta para os dados armazenados na lista de adjacências do vértice especificado por v . É responsabilidade de o chamador para gerenciar o armazenamento associado aos dados.
 /// @param graph ponteiro para um grafo
-/// @param data1 vertice incidente
-/// @param data2 vertice sucessor
+/// @param v vertice incidente
+/// @param w vertice sucessor
 /// @return 0 se a inserção da aresta for bem-sucedida, 1 se a aresta já existir ou -1 caso contrário.
-int graph_remove_edge(Graph *graph, void *data1, void *data2);
+int graph_remove_edge(Graph *graph, void *v, void *w);
 
 /// @brief 
 /// @param graph 

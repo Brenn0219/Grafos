@@ -148,8 +148,34 @@ int graph_remove_vertex(Graph *graph, void *data) {
     return 0;
 }
 
-int graph_remove_edge(Graph *graph, void *data1, void *data2) {
-    Cell *element;
+int graph_remove_edge(Graph *graph, void *v, void *w) {
+    Cell *element, *prev;
 
-   
+    for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
+        if (graph->match(v, ((AdjList *) list_data(element))->vertex, graph_structure_size(graph)))
+            break;
+    }
+
+    if (element == NULL)
+        return -1;
+
+    List *list = ((AdjList *) list_data(element))->adjacent;
+    prev = list_head(list);
+    if (!graph->match(w, prev->data, list_structure_size(list))) {
+        while (prev != NULL) {
+            if (prev->next != NULL) {
+                if (graph->match(w, prev->next->data, list_structure_size(list)))
+                    break;
+            } else 
+                return -1;   
+
+            prev = list_next(prev);
+        }
+    } else  
+        prev = NULL;
+
+    if ((list_remove(list, prev)) == -1)
+        return -1;
+    
+    return 0;
 }

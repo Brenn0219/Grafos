@@ -33,14 +33,14 @@ int main() {
     graph_init(&graph, sizeof(int), macth, destroy);
     graph_build(&graph, path);
 
-    int x = 1;
-    graph_remove_vertex(&graph, (void *) &x);
+    int x = 1, y = 43;
+    graph_remove_edge(&graph, (void *) &x, (void *) &y);
 
-    x = 10;
-    graph_remove_vertex(&graph, (void *) &x);
+    y = 10;
+    graph_remove_edge(&graph, (void *) &x, (void *) &y);
 
-    x = 100;
-    graph_remove_vertex(&graph, (void *) &x);
+    y = 2;
+    graph_remove_edge(&graph, (void *) &x, (void *) &y);
 
     graph_print(&graph);
 
