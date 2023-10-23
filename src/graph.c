@@ -126,6 +126,7 @@ int graph_remove_vertex(Graph *graph, void *data) {
     if (element == NULL)
         return -1;
 
+    // book page 383
     if (!graph->match(data, ((AdjList *) list_data(element))->vertex, graph_structure_size(graph))) {
         while (element != NULL) {
             if (element->next != NULL) {
@@ -209,6 +210,24 @@ int graph_remove_edge(Graph *graph, void *v, void *w) {
 
     if ((list_remove(list, prev)) == -1)
         return -1;
+    
+    return 0;
+}
+
+int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist) {
+    Cell *element, *prev = NULL;
+
+    for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
+        if (data, ((AdjList *) list_data(element))->vertex, graph_structure_size(graph))
+            break;
+        
+        prev = element;
+    }
+
+    if (element == NULL)
+        return -1;
+
+    *adjlist = list_data(element);
     
     return 0;
 }

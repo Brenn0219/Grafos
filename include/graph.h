@@ -20,6 +20,13 @@ typedef struct AdjList {
     List *adjacent;
 } AdjList;
 
+/// @brief Estrutura de Vertice usada nas pesquisas dfs e bfs
+typedef enum VertexColor {
+    WHITE, 
+    GRAY, 
+    BLACK
+} VertexColor;
+
 /// @brief Inicializa o grafico especificado por graph. Esta operacao deve ser chamada para um grafico antes que o grafico possa ser usado com qualquer outra operacao. O argumento match e uma funcao usada por varias operacaoes graficas para determinar se dois vertices correspondem. Deve retornar 1 se first_key for igual second_key e caso contrario. O argumento destroy fornece uma maneira de liberar dados alocados dinamicamente quando graph_destroy e chamado graph_destroy. Para por exemplo, se o gráfico contiver dados alocados dinamicamente usando malloc, destroy devera ser definido como free para libere os dados enquanto o gráfico é destruído. Para dados estruturados contendo vários alocados dinamicamente membros, destroy deve ser definido como uma funçao definida pelo usuario que chama free para cada membro alocado dinamicamente. membro, bem como para a propria estrutura. Para um grafico contendo dados que não devem ser liberados, destrua deve ser definido como NULL. Complexidade - O(1)
 /// @param graph ponteiro para um grafo
 /// @param structure_size tamanho da estrutura utilizada na lista
@@ -61,7 +68,14 @@ int graph_remove_vertex(Graph *graph, void *data);
 /// @param w vertice sucessor
 /// @return 0 se a inserção da aresta for bem-sucedida, 1 se a aresta já existir ou -1 caso contrário.
 int graph_remove_edge(Graph *graph, void *v, void *w);
- 
+
+/// @brief Recupera vértices adjacentes ao vértice especificado pelos dados em graph . Os vértices adjacentes são retornado na forma de uma estrutura AdjList, uma estrutura contendo os dados de correspondência de vértices e um conjunto de vértices adjacentes a ele. Um ponteiro para a lista de adjacências real no grafo é retornado, portanto não deve ser manipulado pelo chamador. Complexidade - O (V), onde V é o número de vértices no gráfico.
+/// @param graph ponteiro para um grafo
+/// @param data vertice 
+/// @param adjlist lista adjacente do vertice/data
+/// @return 1 se o segundo vértice for adjacente ao primeiro vértice ou caso contrário.
+int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist);
+
 // Macro que retorna a lista encadeada utilizada no grafo
 #define graph_adjlists(graph) ((graph)->adjlists)
 // Macro que retorna o valor da estrutura que ira ser utilizada na lista do grafo

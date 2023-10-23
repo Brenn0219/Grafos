@@ -3,47 +3,56 @@
 #include "../include/graph.h"
 #include "../include/dfs.h"
 
-/// @brief 
-/// @param graph  
-/// @param v 
-/// @param table 
-/// @param lifetime 
-static void dfs(Graph *graph, int v, DfsTable *table, int *lifetime) {
-    // list_sort(graph->adjacent[v]);
+static int dfs_main(Graph *graph, AdjList *adjlist, List *ordered) {
+    AdjList *clr_adjlist;
+    DfsVertex *clr_vertex, *adj_vertex;
+    Cell *member;
 
-    table->start[v] = ++*lifetime;
+    ((DfsVertex *) adjlist->vertex)->color = GRAY;
 
-    for(Cell *i = list_head(graph->adjacent[v]); i != NULL; i = list_next(i)) {
-        if(table->start[list_data(i)] == 0) {
-            table->father[list_data(i)] = v;
-            dfs(graph, list_data(i), table, lifetime);
+    for (member = list_head(adjlist->adjacent); member != NULL; member = list_next(member)) {
+        adj_vertex = list_data(member);
+
+        if (graph_adjlist(graph, adj_vertex, &clr_adjlist) != 0)
+            return -1;
+
+        clr_vertex = clr_adjlist->vertex;
+
+        if (clr_vertex->color == WHITE) {
+            if (dfs_main(graph, clr_adjlist, ordered) != 0)
+                return -1;
         }
     }
+
+    ((DfsVertex *) adjlist->vertex)->color = BLACK;
     
-    table->end[v] = ++*lifetime;
+    if (list_insert(ordered, NULL, (DfsVertex *) adjlist->vertex) != 0)
+        return -1;
+    
+    return 0;
 }
 
-void dfs_table_free(DfsTable *table) {
-    free(table->start);
-    free(table->end);
-    free(table->father);
-}
+int dfs(Graph *graph, List *ordered) {
+    DfsVertex *vertex;
+    Cell *element;
 
-void dfs_table_init(DfsTable *table, int n) {
-    table->start = (int *) malloc(sizeof(int) * n);
-    table->end = (int *) malloc(sizeof(int) * n);
-    table->father = (int *) malloc(sizeof(int) * n);
-
-    for(int i = 1; i < n; i++) {
-        table->start[i] = 0;
-        table->end[i] = 0;
-        table->father[i] = -1;
+    for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
+        vertex = ((AdjList *) list_data(element))->vertex;
+        vertex->color = WHITE;
     }
-}
 
-void graph_dfs(Graph *graph, DfsTable *table) {
-    int n = graph->vcount + 1, lifetime = 0;
-    
-    dfs_table_init(table, n);
-    dfs(graph, 1, table, &lifetime);
+    list_init(ordered, graph_structure_size(graph), NULL);
+
+    for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
+        vertex = ((AdjList *) list_data(element))->vertex;
+
+        if (vertex->color == WHITE) {
+            if ((dfs_main(graph, (AdjList *) list_data(element), ordered)) != 0 ) {
+                list_destroy(ordered);
+                return -1;
+            }
+        }
+    }
+
+    return 0;
 }

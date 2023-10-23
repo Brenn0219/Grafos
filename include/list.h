@@ -27,10 +27,10 @@ void list_init(List *list, size_t structure_size, void (*destroy)(void *data));
 /// @param list ponteiro para uma lista encadeada 
 void list_destroy(List *list);
 
-/// @brief 
-/// @param data 
-/// @param structure_size 
-/// @return 
+/// @brief Cria uma nova celula na memoria que ira ser inserida na lista
+/// @param data novo dado a ser criado
+/// @param structure_size tamanhado da estrutura nova
+/// @return retorna uma nove celula caso for bem sucessida e NULL caso contrario
 Cell* list_new_cell(const void *data, size_t structure_size);
 
 /// @brief Insere um elemento logo apos a lista encadeada ser inicializada. Se o element for NULL, o novo elemento e inserido no topo da lista. O novo elemento contem um ponteiro para dados, entao a memoria referenciada pelos dados deve permanecer valida equanto permanecert na lista. Complexidade - O(1)

@@ -4,6 +4,7 @@
 #include "../include/graph.h"
 #include "../include/list.h"
 #include "../include/print_graph.h"
+#include "../include/dfs.h"
 
 /// @brief funcao de comparacao das estruturas usadas em lista e grafos
 /// @param first_key primeira chave a ser comparada
@@ -33,11 +34,8 @@ int main() {
     graph_init(&graph, sizeof(int), macth, destroy);
     graph_build(&graph, path);
 
-    int x = 10;
-    graph_remove_vertex(&graph, (void *) &x);
-
-    graph_print(&graph);
-    graph_destroy(&graph);
+    List ordered;
+    dfs(&graph, &ordered);
 
     return 0;
 }
