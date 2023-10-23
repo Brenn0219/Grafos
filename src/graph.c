@@ -42,14 +42,24 @@ int graph_build(Graph *graph, char *path) {
 }
 
 void graph_destroy(Graph *graph) {
-    AdjList *adjlist;
+    Cell *element = list_head(graph->adjlists);
 
-    while (list_size(graph->adjlists) > 0) {
+    while (element != NULL) {
+        Cell *prev = element;
         
-        adjlist = (AdjList *) list_data(list_head(graph->adjlists));
-        // list_destroy();
+        list_destroy(((AdjList *) list_data(prev))->adjacent);
+        free(((AdjList *) list_data(prev))->vertex);
+        free(((AdjList *) list_data(prev))->adjacent);
+        free(prev->data);
+        
+        element = list_next(prev);
+        
+        free(prev);
+        
     }
-    
+
+    free(graph->adjlists);
+    memset(graph, 0, sizeof(Graph));
 }
 
 int graph_insert_vertex(Graph *graph, const void *data) {

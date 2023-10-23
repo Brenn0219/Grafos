@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "list.h"
 
-/// @brief 
+/// @brief Estrutura de dados Grafos, são compostos por dois tipos de elementos: vértices e arestas. Vértices representam objetos, e as bordas estabelecem relacionamentos ou conexões entre os objetos
 typedef struct Graph {
     int vcount; 
     int ecount;
@@ -14,7 +14,7 @@ typedef struct Graph {
     List *adjlists;
 } Graph;
 
-/// @brief 
+/// @brief Estrutura de dados Lista Adjacencia são usadas para grafos esparsos, ou seja, grafos nos quais o número de arestas é menor que o número de vértices ao quadrado.
 typedef struct AdjList {
     void *vertex;
     List *adjacent;
@@ -27,13 +27,13 @@ typedef struct AdjList {
 /// @param destroy ponteiro para funcao de liberacao das estruturas alocadas dinamicamente nas listas
 void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key, size_t structure_size), void (*destroy) (void *data));
 
-/// @brief 
-/// @param graph 
-/// @param path 
+/// @brief Constroi um grafo ralicionando os vertive v e w. A construcao e feita aparti de uma leitura de um arquivo passando o caminho na variavel path. O arquivo tem que contar o total de vertice, total de aresta, seus relacionamentos e por fim o grafico ja tem que esta inicializado com a funcao graph_init. Complexidade - O(V+E)
+/// @param graph ponteiro para um grafo
+/// @param path caminho de um arquivo que contem os relacionamentos de um 
 int graph_build(Graph *graph, char *path);
 
-/// @brief 
-/// @param graph 
+/// @brief Destrói o gráfico especificado por graph . Nenhuma outra operação é permitida após chamar graph_destroy a menos que graph_init seja chamado novamente. A operação graph_destroy remove todos os vértices e arestas de um gráfico e chama a função passada como destroy para graph_init uma vez para cada vértice ou aresta à medida que é removido, desde que destroy não tenha sido definido como NULL.
+/// @param graph ponteiro para um grafo
 void graph_destroy(Graph *graph);
 
 /// @brief Insere um vértice no gráfico especificado por graph. O novo vértice contém um ponteiro para data, então o a memória referenciada pelos dados deve permanecer válida enquanto o vértice permanecer no gráfico. É o responsabilidade do chamador gerenciar o armazenamento associado aos dados. Complexidade - O(V), onde V é o número de vértices no gráfico.
@@ -61,21 +61,8 @@ int graph_remove_vertex(Graph *graph, void *data);
 /// @param w vertice sucessor
 /// @return 0 se a inserção da aresta for bem-sucedida, 1 se a aresta já existir ou -1 caso contrário.
 int graph_remove_edge(Graph *graph, void *v, void *w);
-
-/// @brief 
-/// @param graph 
-/// @param data 
-/// @param adjlist 
-/// @return 
-// int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist);
-
-/// @brief 
-/// @param graph 
-/// @param data1 
-/// @param data2 
-/// @return 
-int graph_is_adjacent(const Graph *graph, const void *data1, const void *data2);
-
+ 
+// Macro que retorna a lista encadeada utilizada no grafo
 #define graph_adjlists(graph) ((graph)->adjlists)
 // Macro que retorna o valor da estrutura que ira ser utilizada na lista do grafo
 #define graph_structure_size(graph) ((graph)->structure_size)

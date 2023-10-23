@@ -37,6 +37,7 @@ int main() {
     graph_remove_vertex(&graph, (void *) &x);
 
     graph_print(&graph);
+    graph_destroy(&graph);
 
     return 0;
 }
