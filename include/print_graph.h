@@ -1,4 +1,4 @@
 #pragma once
 #include "graph.h"
 
-void graph_print(Graph *graph);
+void print_graph(Graph *graph);

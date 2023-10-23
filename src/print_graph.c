@@ -2,7 +2,7 @@
 #include "../include/graph.h"
 #include "../include/list.h"
 
-void graph_print(Graph *graph) {
+void print_graph(Graph *graph) {
     for(Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
         printf("%d: ", *((int *)(((AdjList *) list_data(element))->vertex)));
 
