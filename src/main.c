@@ -1,62 +1,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-// #include "../include/graph.h"
+#include "../include/graph.h"
 #include "../include/list.h"
-// #include "../include/print_graph.h"
+#include "../include/print_graph.h"
 
-/// @brief 
-/// @param first_key 
-/// @param second_key 
-/// @return 
-int macth(const void *first_key, const void *second_key) {
+/// @brief funcao de comparacao das estruturas usadas em lista e grafos
+/// @param first_key primeira chave a ser comparada
+/// @param second_key segunda chave a ser comparada
+/// @param structure_size tamanho das estruturas para comparacao
+/// @return 1 se for igual, 0 se forem diferentes e -1 ser for nulas
+int macth(const void *first_key, const void *second_key, size_t structure_size) {
     if (first_key == NULL || second_key == NULL) 
-        return 0;
-    printf("MACTH 0\n");
+        return -1;
 
-    if (!memcmp(first_key, second_key, sizeof(int)))
+    if (!memcmp(first_key, second_key, structure_size))
         return 1;
-    printf("MACTH 1\n");
+
     return 0;
 }
 
-/// @brief 
-/// @param data 
+/// @brief funcao de liberar estruturas dinamicas da memoria
+/// @param data dado a ser liberado
 void destroy(void *data) {
     free(data);
 }
 
 int main() {
-    List list;
-    
-    list_init(&list, sizeof(int), destroy);
-    printf("list init \n");
-    
-    for (int i = 1; i < 11; i++) {
-        if (!list_insert(&list, NULL, (void *)&i))
-            printf("insert list: %d\n", i);
-        else 
-            printf("error insert list\n");
-    }
+    Graph graph;
+    char *path = "data/graph-test-100.txt";
 
-    for (int i = 0; i < 3; i++) {
-        if (!list_remove(&list, NULL))
-            printf("remove list: %d\n", i);
-        else 
-            printf("error insert list\n");
-    }
+    graph_init(&graph, sizeof(int), macth, destroy);
+    graph_build(&graph, path);
 
-    for (Cell *i = list_head(&list); i != NULL; i = list_next(i))
-        printf("%d - ", *(int *)list_data(i));
-    printf("\n");
+    int x = 1;
+    graph_remove_vertex(&graph, (void *) &x);
 
-    int x = 6;
-    Cell *cell = list_search(&list, (void *) &x);
+    x = 10;
+    graph_remove_vertex(&graph, (void *) &x);
 
-    if (cell != NULL)
-        printf("Cell: %d\n", *(int *) list_data(cell));
+    x = 100;
+    graph_remove_vertex(&graph, (void *) &x);
 
-    list_destroy(&list);
+    graph_print(&graph);
 
     return 0;
 }

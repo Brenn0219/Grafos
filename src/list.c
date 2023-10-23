@@ -24,9 +24,10 @@ void list_destroy(List *list) {
 
 Cell* list_new_cell(const void *data, size_t structure_size) {
     Cell *new_cell = (Cell *) malloc(sizeof(Cell));
+    
     if (new_cell == NULL)
         return NULL;    
-
+    
     new_cell->next = NULL;
     new_cell->data = (void *) malloc(structure_size); 
     memcpy(new_cell->data, data, structure_size);
@@ -36,7 +37,7 @@ Cell* list_new_cell(const void *data, size_t structure_size) {
 
 int list_insert(List *list, Cell *element, const void *data) {
     Cell *new_element = list_new_cell(data, list_structure_size(list));
-
+    
     if (new_element == NULL)
         return -1;
     

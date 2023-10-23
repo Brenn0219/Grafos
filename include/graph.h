@@ -6,8 +6,9 @@
 typedef struct Graph {
     int vcount; 
     int ecount;
+    size_t structure_size;
 
-    int (*match) (const void *first_key, const void *second_key);
+    int (*match) (const void *first_key, const void *second_key, size_t structure_size);
     void (*destroy) (void *data);
 
     List *adjlists;
@@ -16,14 +17,15 @@ typedef struct Graph {
 /// @brief 
 typedef struct AdjList {
     void *vertex;
-    List adjacent;
+    List *adjacent;
 } AdjList;
 
 /// @brief Inicializa o grafico especificado por graph. Esta operacao deve ser chamada para um grafico antes que o grafico possa ser usado com qualquer outra operacao. O argumento match e uma funcao usada por varias operacaoes graficas para determinar se dois vertices correspondem. Deve retornar 1 se first_key for igual second_key e caso contrario. O argumento destroy fornece uma maneira de liberar dados alocados dinamicamente quando graph_destroy e chamado graph_destroy. Para por exemplo, se o gráfico contiver dados alocados dinamicamente usando malloc, destroy devera ser definido como free para libere os dados enquanto o gráfico é destruído. Para dados estruturados contendo vários alocados dinamicamente membros, destroy deve ser definido como uma funçao definida pelo usuario que chama free para cada membro alocado dinamicamente. membro, bem como para a propria estrutura. Para um grafico contendo dados que não devem ser liberados, destrua deve ser definido como NULL. Complexidade - O(1)
 /// @param graph ponteiro para um grafo
+/// @param structure_size tamanho da estrutura utilizada na lista
 /// @param match ponteiro para funcao de comparacao entre as estruturas alocadas na lista
 /// @param destroy ponteiro para funcao de liberacao das estruturas alocadas dinamicamente nas listas
-void graph_init(Graph *graph, int (*match) (const void *first_key, const void *second_key), void (*destroy) (void *data));
+void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key, size_t structure_size), void (*destroy) (void *data));
 
 /// @brief 
 /// @param graph 
@@ -51,14 +53,14 @@ int graph_insert_edge(Graph *graph, const void *data1, const void *data2);
 /// @param graph ponteiro para um grafo
 /// @param data vertice a ser removido
 /// @return 0 se a inserção da aresta for bem-sucedida, 1 se a aresta já existir ou -1 caso contrário.
-int graph_rem_vertex(Graph *graph, void **data);
+int graph_remove_vertex(Graph *graph, void *data);
 
 /// @brief Remove a borda de data1 para data2 no gráfico especificado por graph . No retorno, data2 aponta para os dados armazenados na lista de adjacências do vértice especificado por data1 . É responsabilidade de o chamador para gerenciar o armazenamento associado aos dados.
 /// @param graph ponteiro para um grafo
 /// @param data1 vertice incidente
 /// @param data2 vertice sucessor
 /// @return 0 se a inserção da aresta for bem-sucedida, 1 se a aresta já existir ou -1 caso contrário.
-int graph_rem_edge(Graph *graph, void *data1, void **data2);
+int graph_remove_edge(Graph *graph, void *data1, void *data2);
 
 /// @brief 
 /// @param graph 
@@ -75,6 +77,8 @@ int graph_rem_edge(Graph *graph, void *data1, void **data2);
 int graph_is_adjacent(const Graph *graph, const void *data1, const void *data2);
 
 #define graph_adjlists(graph) ((graph)->adjlists)
+// Macro que retorna o valor da estrutura que ira ser utilizada na lista do grafo
+#define graph_structure_size(graph) ((graph)->structure_size)
 // Macro que avalia o número de vértices no gráfico especificado por graph.
 #define graph_vcount(graph) ((graph)->vcount)
 // Macro que avalia o número de arestas no gráfico especificado por gráfico.
