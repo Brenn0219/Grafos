@@ -15,7 +15,10 @@ int macth(const void *first_key, const void *second_key) {
     if (first_key == NULL || second_key == NULL) 
         return -1;
 
-    if (!memcmp(first_key, second_key, sizeof(Vertex)))
+    Vertex *v = (Vertex *) (first_key);
+    Vertex *w = (Vertex *) (second_key);
+
+    if (!memcmp((void *) &v->vertice, (void *) &w->vertice, sizeof(int)))
         return 1;
 
     return 0;
@@ -31,21 +34,25 @@ int main() {
     Graph graph;
     char *path = "data/graph-test-100.txt";
     
-    graph_init(&graph, sizeof(Vertex), macth, destroy);
+    graph_init(&graph, sizeof(WeightedVertex), macth, destroy);
     graph_build(&graph, path);
     
-    Vertex v, w;
+    WeightedVertex v, w;
     v.vertice = 1;
-    w.vertice = 43;
-    graph_remove_edge(&graph, (void *) &v, (void *) &w);
-
     w.vertice = 10;
     graph_remove_edge(&graph, (void *) &v, (void *) &w);
 
-    w.vertice = 2;
+    w.vertice = 43;
     graph_remove_edge(&graph, (void *) &v, (void *) &w);
 
+    w.vertice = 22;
+    graph_remove_edge(&graph, (void *) &v, (void *) &w);
+
+    v.vertice = 10;
+    graph_remove_vertex(&graph, (void *) &v);
+
     print_graph(&graph);
+    graph_destroy(&graph);
 
     return 0;
 }

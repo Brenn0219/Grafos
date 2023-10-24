@@ -29,16 +29,21 @@ int graph_build(Graph *graph, const char *path) {
     
     ++v_count;
     for(int i = 1; i < v_count; i++) {
-        Vertex vertex;
+        WeightedVertex vertex;
         vertex.vertice = i; 
+        vertex.weight = -1;
         graph_insert_vertex(graph, (void *)&vertex);
     }
         
     for(int i = 0; i < e_count; i++) {
         if (fscanf(file, "%d %d", &v, &w) != EOF) {
-            Vertex v_vertex, w_vertex;
+            WeightedVertex v_vertex, w_vertex;
+            
             v_vertex.vertice = v;
+            v_vertex.weight = -1;
             w_vertex.vertice = w;
+            w_vertex.weight = -1;
+
             graph_insert_edge(graph, (void *)& v_vertex, (void *)& w_vertex);
         } else 
             break;
@@ -194,7 +199,7 @@ int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist) {
     Cell *element, *prev = NULL;
 
     for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (data, ((AdjList *) list_data(element))->vertex, graph_structure_size(graph))
+        if (graph->match(data, ((AdjList *) list_data(element))->vertex))
             break;
         
         prev = element;
