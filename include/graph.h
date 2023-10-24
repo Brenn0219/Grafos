@@ -32,6 +32,7 @@ typedef struct Vertex {
     int vertice;
 } Vertex;
 
+/// @brief Estrutura de Vertices que cada lista adjacente tem um vertice com peso. ex: v - w, w armazena o peso desta relacao
 typedef struct WeightedVertex {
     int vertice;
     int weight;

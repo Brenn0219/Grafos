@@ -18,7 +18,7 @@ void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *f
 
 int graph_build(Graph *graph, const char *path) {
     FILE *file = fopen(path, "r");
-    int v_count, e_count, v, w;
+    int v_count, e_count, v, w, weight;
     
     if (file == NULL) {
         perror("Erro ao abrir o arquivo");
@@ -36,13 +36,13 @@ int graph_build(Graph *graph, const char *path) {
     }
         
     for(int i = 0; i < e_count; i++) {
-        if (fscanf(file, "%d %d", &v, &w) != EOF) {
+        if (fscanf(file, "%d %d %d", &v, &w, &weight) != EOF) {
             WeightedVertex v_vertex, w_vertex;
             
             v_vertex.vertice = v;
             v_vertex.weight = -1;
             w_vertex.vertice = w;
-            w_vertex.weight = -1;
+            w_vertex.weight = weight;
 
             graph_insert_edge(graph, (void *)& v_vertex, (void *)& w_vertex);
         } else 
