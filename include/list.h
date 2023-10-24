@@ -44,7 +44,7 @@ int list_insert(List *list, Cell *element, const void *data);
 /// @param list ponteiro para lista encadeada
 /// @param element referencia de posicao para remover o dado
 /// @param data elemento a ser removido
-/// @return 0 se a insercao do elemento for bem sucedidade ou -1 caso contrario
+/// @return 0 se a remocao do elemento for bem sucedidade ou -1 caso contrario
 int list_remove(List *list, Cell *element);
 
 /// @brief Pesquisa um elemento na lista encadeada

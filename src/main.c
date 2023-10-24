@@ -11,11 +11,11 @@
 /// @param second_key segunda chave a ser comparada
 /// @param structure_size tamanho das estruturas para comparacao
 /// @return 1 se for igual, 0 se forem diferentes e -1 ser for nulas
-int macth(const void *first_key, const void *second_key, size_t structure_size) {
+int macth(const void *first_key, const void *second_key) {
     if (first_key == NULL || second_key == NULL) 
         return -1;
 
-    if (!memcmp(first_key, second_key, structure_size))
+    if (!memcmp(first_key, second_key, sizeof(Vertex)))
         return 1;
 
     return 0;
@@ -30,12 +30,22 @@ void destroy(void *data) {
 int main() {
     Graph graph;
     char *path = "data/graph-test-100.txt";
-
-    graph_init(&graph, sizeof(int), macth, destroy);
+    
+    graph_init(&graph, sizeof(Vertex), macth, destroy);
     graph_build(&graph, path);
+    
+    Vertex v, w;
+    v.vertice = 1;
+    w.vertice = 43;
+    graph_remove_edge(&graph, (void *) &v, (void *) &w);
 
-    List ordered;
-    dfs(&graph, &ordered);
+    w.vertice = 10;
+    graph_remove_edge(&graph, (void *) &v, (void *) &w);
+
+    w.vertice = 2;
+    graph_remove_edge(&graph, (void *) &v, (void *) &w);
+
+    print_graph(&graph);
 
     return 0;
 }

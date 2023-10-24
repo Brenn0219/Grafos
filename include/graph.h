@@ -8,7 +8,7 @@ typedef struct Graph {
     int ecount;
     size_t structure_size;
 
-    int (*match) (const void *first_key, const void *second_key, size_t structure_size);
+    int (*match) (const void *first_key, const void *second_key);
     void (*destroy) (void *data);
 
     List *adjlists;
@@ -27,17 +27,22 @@ typedef enum VertexColor {
     BLACK
 } VertexColor;
 
+/// @brief Estrutura de Vertice no grafo
+typedef struct Vertex {
+    int vertice;
+} Vertex;
+
 /// @brief Inicializa o grafico especificado por graph. Esta operacao deve ser chamada para um grafico antes que o grafico possa ser usado com qualquer outra operacao. O argumento match e uma funcao usada por varias operacaoes graficas para determinar se dois vertices correspondem. Deve retornar 1 se first_key for igual second_key e caso contrario. O argumento destroy fornece uma maneira de liberar dados alocados dinamicamente quando graph_destroy e chamado graph_destroy. Para por exemplo, se o gráfico contiver dados alocados dinamicamente usando malloc, destroy devera ser definido como free para libere os dados enquanto o gráfico é destruído. Para dados estruturados contendo vários alocados dinamicamente membros, destroy deve ser definido como uma funçao definida pelo usuario que chama free para cada membro alocado dinamicamente. membro, bem como para a propria estrutura. Para um grafico contendo dados que não devem ser liberados, destrua deve ser definido como NULL. Complexidade - O(1)
 /// @param graph ponteiro para um grafo
 /// @param structure_size tamanho da estrutura utilizada na lista
 /// @param match ponteiro para funcao de comparacao entre as estruturas alocadas na lista
 /// @param destroy ponteiro para funcao de liberacao das estruturas alocadas dinamicamente nas listas
-void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key, size_t structure_size), void (*destroy) (void *data));
+void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key), void (*destroy) (void *data));
 
 /// @brief Constroi um grafo ralicionando os vertive v e w. A construcao e feita aparti de uma leitura de um arquivo passando o caminho na variavel path. O arquivo tem que contar o total de vertice, total de aresta, seus relacionamentos e por fim o grafico ja tem que esta inicializado com a funcao graph_init. Complexidade - O(V+E)
 /// @param graph ponteiro para um grafo
 /// @param path caminho de um arquivo que contem os relacionamentos de um 
-int graph_build(Graph *graph, char *path);
+int graph_build(Graph *graph, const char *path);
 
 /// @brief Destrói o gráfico especificado por graph . Nenhuma outra operação é permitida após chamar graph_destroy a menos que graph_init seja chamado novamente. A operação graph_destroy remove todos os vértices e arestas de um gráfico e chama a função passada como destroy para graph_init uma vez para cada vértice ou aresta à medida que é removido, desde que destroy não tenha sido definido como NULL.
 /// @param graph ponteiro para um grafo
@@ -53,7 +58,7 @@ int graph_insert_vertex(Graph *graph, const void *data);
 /// @param graph ponteiro para um grafo
 /// @param data1 vertice incidente
 /// @param data2 vertice sucessor
-/// @return 0 se a inserção da aresta for bem-sucedida, 1 se a aresta já existir ou -1 caso contrário.
+/// @return 0 se a remocao da aresta for bem-sucedidae, -1 caso contrário.
 int graph_insert_edge(Graph *graph, const void *data1, const void *data2);
 
 /// @brief Remove os dados de correspondência de vértices do gráfico especificado por graph . Todas as arestas incidentes de e para o vértice deve ter sido removido anteriormente usando graph_remove_edge . Ao retornar, os dados apontam para o dados armazenados no vértice que foi removido. É responsabilidade do chamador gerenciar o armazenamento associado aos dados. Complexidade - O (V + E ), onde V é o número de vértices no gráfico e E é o número de arestas.
