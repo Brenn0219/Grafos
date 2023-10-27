@@ -87,6 +87,12 @@ int graph_remove_edge(Graph *graph, void *v, void *w);
 /// @return 1 se o segundo vértice for adjacente ao primeiro vértice ou caso contrário.
 int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist);
 
+/// @brief Realiza uma pesqusia em um grafo para encontrar e retornar um vertice. Complexidade O(v) 
+/// @param graph ponteiro para um grafo
+/// @param data vertice a ser encontrado
+/// @return retorna um ponteiro para o vertice do grafico
+void* graph_vertex_search(const Graph *graph, const void *data);
+
 // Macro que retorna a lista encadeada utilizada no grafo
 #define graph_adjlists(graph) ((graph)->adjlists)
 // Macro que retorna o valor da estrutura que ira ser utilizada na lista do grafo

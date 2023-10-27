@@ -212,3 +212,12 @@ int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist) {
     
     return 0;
 }
+
+void* graph_vertex_search(const Graph *graph, const void *data) {
+    for(Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
+        if (graph->match(element->data, data))
+            return element;
+    }
+
+    return NULL;
+}
