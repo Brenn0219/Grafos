@@ -78,7 +78,7 @@ int graph_insert_vertex(Graph *graph, const void *data) {
     int retval;
 
     for(Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (graph->match(data, ((AdjList *) list_data(element))->vertex))
+        if (!graph->match(data, ((AdjList *) list_data(element))->vertex))
             return 1;
     }
     
@@ -105,7 +105,7 @@ int graph_insert_edge(Graph *graph, const void *v, const void *w) {
     int retval;
 
     for(element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (graph->match(w, ((AdjList *) list_data(element))->vertex))
+        if (!graph->match(w, ((AdjList *) list_data(element))->vertex))
             break;
     }
     
@@ -113,7 +113,7 @@ int graph_insert_edge(Graph *graph, const void *v, const void *w) {
         return -1;
 
     for(element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (graph->match(v, ((AdjList *) list_data(element))->vertex))
+        if (!graph->match(v, ((AdjList *) list_data(element))->vertex))
             break;
     }
 
@@ -132,7 +132,7 @@ int graph_remove_vertex(Graph *graph, void *data) {
     Cell *element, *prev = NULL;
 
     for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (graph->match(data, ((AdjList *) list_data(element))->vertex))
+        if (!graph->match(data, ((AdjList *) list_data(element))->vertex))
             break;
         prev = element;
     }
@@ -150,7 +150,7 @@ int graph_remove_vertex(Graph *graph, void *data) {
         prev = NULL;
 
         for (Cell *w = list_head(list); w != NULL; w = list_next(w)) {
-            if (graph->match(data, w->data)) {
+            if (!graph->match(data, w->data)) {
                 if (list_remove(list, prev) == -1)
                     return -1;
             }
@@ -169,7 +169,7 @@ int graph_remove_edge(Graph *graph, void *v, void *w) {
     Cell *element, *prev = NULL;
 
     for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (graph->match(v, ((AdjList *) list_data(element))->vertex))
+        if (!graph->match(v, ((AdjList *) list_data(element))->vertex))
             break;
     }
 
@@ -178,7 +178,7 @@ int graph_remove_edge(Graph *graph, void *v, void *w) {
 
     list = ((AdjList *) list_data(element))->adjacent;
     for (element = list_head(list); element != NULL; element = list_next(element)) {
-        if (graph->match(w, element->data))
+        if (!graph->match(w, element->data))
             break;
         
         prev = element;
@@ -199,7 +199,7 @@ int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist) {
     Cell *element, *prev = NULL;
 
     for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (graph->match(data, ((AdjList *) list_data(element))->vertex))
+        if (!graph->match(data, ((AdjList *) list_data(element))->vertex))
             break;
         
         prev = element;
@@ -215,7 +215,7 @@ int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist) {
 
 void* graph_vertex_search(const Graph *graph, const void *data) {
     for(Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (graph->match(element->data, data))
+        if (!graph->match(element->data, data))
             return element;
     }
 

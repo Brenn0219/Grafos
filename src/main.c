@@ -12,16 +12,15 @@
 /// @param structure_size tamanho das estruturas para comparacao
 /// @return 1 se for igual, 0 se forem diferentes e -1 ser for nulas
 int macth(const void *first_key, const void *second_key) {
-    if (first_key == NULL || second_key == NULL) 
-        return -1;
-
     WeightedVertex *v = (WeightedVertex *) (first_key);
     WeightedVertex *w = (WeightedVertex *) (second_key);
 
-    if (v->vertice == w->vertice)
+    if (v->vertice > w->vertice) 
         return 1;
-
-    return 0;
+    else if (v->vertice == w->vertice)
+        return 0;
+    else 
+        return -1;
 }
 
 /// @brief funcao de liberar estruturas dinamicas da memoria
