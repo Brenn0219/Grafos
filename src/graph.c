@@ -185,3 +185,51 @@ void* graph_vertex_search(const Graph *graph, const void *data) {
 
     return NULL;
 }
+
+static int cylce(Graph *graph, Cell *element, Vertex *father, int *visited, int *parents) {
+    AdjList *adjlist;
+    Vertex *v, *w;
+    
+    while (element != NULL) {
+        adjlist = (AdjList *) list_data(element);
+        v = adjlist->vertex;
+
+        visited[v->vertice] = 1;
+        parents[v->vertice] = father->vertice;
+
+        for (Cell *current = list_head(adjlist->adjacent); current != NULL; current = list_next(current)) {
+            w = (Vertex *)(list_data(current));
+        
+            if (!visited[w->vertice]) {
+                element = graph_vertex_search(graph, (void *)w);
+                return cylce(graph, element, v, visited, parents);
+            } else  
+                return 1;
+        }
+
+        element = list_next(element);
+    }
+
+    return 0;
+}
+
+int graph_has_cycle(Graph *graph) {
+    int n = graph->vcount + 1;
+    int *visited = (int *) malloc(sizeof(int) * n),
+        *parent = (int *) malloc(sizeof(int) * n);
+    Cell *element = list_head(graph->adjlists);
+    Vertex *v;
+
+    for (element = list_head(graph->adjlists); element != NULL; element = list_next(element))
+        v = (Vertex *)(((AdjList *) list_data(element))->vertex);
+
+    for (int i = 1; i < n; i++) {
+        visited[i] = 0;
+        parent[i] = 0;
+    }
+
+    element = list_head(graph->adjlists);
+    v->vertice = -1;
+
+    return cylce(graph, element, v, visited, parent);
+}

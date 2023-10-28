@@ -69,7 +69,11 @@ int main() {
     graph_init(&graph, sizeof(Vertex), macth, destroy);
     graph_build(&graph, path);
 
-    print_graph(&graph);
+    if (graph_has_cycle(&graph))
+        printf("grafico com ciclo\n");
+    else 
+        printf("grafico aciclico\n");
+
     graph_destroy(&graph);
 
     return 0;
