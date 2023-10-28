@@ -16,42 +16,6 @@ void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *f
     list_init(graph->adjlists, sizeof(AdjList), NULL);
 }
 
-int graph_build(Graph *graph, const char *path) {
-    FILE *file = fopen(path, "r");
-    int v_count, e_count, v, w, weight;
-    
-    if (file == NULL) {
-        perror("Erro ao abrir o arquivo");
-        return -1;
-    }
-
-    fscanf(file, "%d %d", &v_count, &e_count);
-    
-    ++v_count;
-    for(int i = 1; i < v_count; i++) {
-        WeightedVertex vertex;
-        vertex.vertice = i; 
-        vertex.weight = -1;
-        graph_insert_vertex(graph, (void *)&vertex);
-    }
-        
-    for(int i = 0; i < e_count; i++) {
-        if (fscanf(file, "%d %d %d", &v, &w, &weight) != EOF) {
-            WeightedVertex v_vertex, w_vertex;
-            
-            v_vertex.vertice = v;
-            v_vertex.weight = -1;
-            w_vertex.vertice = w;
-            w_vertex.weight = weight;
-
-            graph_insert_edge(graph, (void *)& v_vertex, (void *)& w_vertex);
-        } else 
-            break;
-    }
-    
-    fclose(file);
-}
-
 void graph_destroy(Graph *graph) {
     Cell *element = list_head(graph->adjlists);
 

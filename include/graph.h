@@ -45,11 +45,6 @@ typedef struct WeightedVertex {
 /// @param destroy ponteiro para funcao de liberacao das estruturas alocadas dinamicamente nas listas
 void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key), void (*destroy) (void *data));
 
-/// @brief Constroi um grafo ralicionando os vertive v e w. A construcao e feita aparti de uma leitura de um arquivo passando o caminho na variavel path. O arquivo tem que contar o total de vertice, total de aresta, seus relacionamentos e por fim o grafico ja tem que esta inicializado com a funcao graph_init. Complexidade - O(V+E)
-/// @param graph ponteiro para um grafo
-/// @param path caminho de um arquivo que contem os relacionamentos de um 
-int graph_build(Graph *graph, const char *path);
-
 /// @brief Destrói o gráfico especificado por graph . Nenhuma outra operação é permitida após chamar graph_destroy a menos que graph_init seja chamado novamente. A operação graph_destroy remove todos os vértices e arestas de um gráfico e chama a função passada como destroy para graph_init uma vez para cada vértice ou aresta à medida que é removido, desde que destroy não tenha sido definido como NULL.
 /// @param graph ponteiro para um grafo
 void graph_destroy(Graph *graph);
