@@ -179,7 +179,7 @@ int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist) {
 
 void* graph_vertex_search(const Graph *graph, const void *data) {
     for(Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if (!graph->match(element->data, data))
+        if (!graph->match(data, ((AdjList *) list_data(element))->vertex))
             return element;
     }
 
