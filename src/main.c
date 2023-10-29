@@ -3,6 +3,7 @@
 #include <memory.h>
 #include "../include/graph.h"
 #include "../include/list.h"
+#include  "../include/stack.h"
 #include "../include/print_graph.h"
 #include "../include/dfs.h"
 
@@ -60,21 +61,36 @@ int graph_build(Graph *graph, const char *path) {
     }
     
     fclose(file);
-}
+} 
 
 int main() {
-    Graph graph;
-    char *path = "data/graph-test-100.txt";
+    Stack stack;   
+    Vertex v, *w;
+    int size;
+
+    stack_init(&stack, sizeof(Vertex), destroy);
+
+    for (int i = 1; i < 11; i++) {
+        v.vertice = i;
+        stack_push(&stack, (void *) &v);
+    }
     
-    graph_init(&graph, sizeof(Vertex), macth, destroy);
-    graph_build(&graph, path);
+    for (Cell *i = list_head(&stack); i != NULL; i = list_next(i))
+        printf("%d - ", ((Vertex *) list_data(i))->vertice);
+    printf("\n");
 
-    if (graph_has_cycle(&graph))
-        printf("grafico com ciclo\n");
-    else 
-        printf("grafico aciclico\n");
+    for (int i = 0; i < 3; i++)
+        stack_pop(&stack);
 
-    graph_destroy(&graph);
+    for (Cell *i = list_head(&stack); i != NULL; i = list_next(i))
+        printf("%d - ", ((Vertex *) list_data(i))->vertice);
+    printf("\n");
+    
+    w = (Vertex *) stack_peek(&stack);
+    size = stack_size(&stack);
+    printf("size: %d\n", size);
+
+    stack_destroy(&stack);
 
     return 0;
 }
