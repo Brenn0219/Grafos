@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <memory.h>
 #include "../include/graph.h"
 #include "../include/list.h"
+#include "../include/stack.h"
 
 void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key), void (*destroy) (void *data)) {
     graph->vcount = 0;
@@ -186,50 +188,69 @@ void* graph_vertex_search(const Graph *graph, const void *data) {
     return NULL;
 }
 
-static int cylce(Graph *graph, Cell *element, Vertex *father, int *visited, int *parents) {
+static int cylce(Graph *graph, void *element, bool *visited, int *edge_to, bool *on_stack, Stack *stack) {
     AdjList *adjlist;
-    Vertex *v, *w;
+    void *v, *w;
+    int retval = 0;
+
+    graph_adjlist(graph, element, &adjlist);
+    v = adjlist->vertex;
+
+    visited[((Vertex *) v)->vertice] = true;
+    on_stack[((Vertex *) v)->vertice] = true;
     
-    while (element != NULL) {
-        adjlist = (AdjList *) list_data(element);
-        v = adjlist->vertex;
-
-        visited[v->vertice] = 1;
-        parents[v->vertice] = father->vertice;
-
-        for (Cell *current = list_head(adjlist->adjacent); current != NULL; current = list_next(current)) {
-            w = (Vertex *)(list_data(current));
-        
-            if (!visited[w->vertice]) {
-                element = graph_vertex_search(graph, (void *)w);
-                return cylce(graph, element, v, visited, parents);
-            } else  
-                return 1;
+    for (Cell *current = list_head(adjlist->adjacent); current != NULL; current = list_next(current)) {
+        w = list_data(current);
+    
+        if (!visited[((Vertex *) w)->vertice]) {
+            edge_to[((Vertex *) w)->vertice] = ((Vertex *) v)->vertice;
+            return cylce(graph, w, visited, edge_to, on_stack, stack);
+        } else if (on_stack[((Vertex *) w)->vertice]) {
+            void *cycle_vertex = v;
+            stack_init(stack, graph_structure_size(graph), graph->destroy);
+            
+            while (graph->match(cycle_vertex, w) != 0) {
+                if (stack_push(stack, cycle_vertex))
+                    return -1;
+                ((Vertex *) cycle_vertex)->vertice = edge_to[((Vertex *) cycle_vertex)->vertice];
+            }
+            if (stack_push(stack, w))
+                return -1;
+            
+            return 1;
         }
-
-        element = list_next(element);
     }
 
-    return 0;
+    on_stack[((Vertex *) v)->vertice] = false;
+    visited[((Vertex *) v)->vertice] = true;
+
+    return retval;
 }
 
-int graph_has_cycle(Graph *graph) {
-    int n = graph->vcount + 1;
-    int *visited = (int *) malloc(sizeof(int) * n),
-        *parent = (int *) malloc(sizeof(int) * n);
-    Cell *element = list_head(graph->adjlists);
-    Vertex *v;
-
-    for (element = list_head(graph->adjlists); element != NULL; element = list_next(element))
-        v = (Vertex *)(((AdjList *) list_data(element))->vertex);
+int graph_has_cycle(Graph *graph, Stack *stack) {
+    int n = graph->vcount + 1, retval = 0;
+    int *edge_to = (int *) malloc(sizeof(int) * n);
+    bool *visited = (bool *) malloc(sizeof(bool) * n),
+        *on_statck = (bool *) malloc(sizeof(bool) * n);
 
     for (int i = 1; i < n; i++) {
-        visited[i] = 0;
-        parent[i] = 0;
+        edge_to[i] = 0;
+        visited[i] = false;
+        on_statck[i] = false;
     }
+    
+    for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
+        retval = cylce(graph, ((AdjList *) list_data(element))->vertex, visited, edge_to, on_statck, stack);
+        
+        if (retval == -1)
+            perror("Error insertion Stack\n");
+        else 
+            break;
+    }
+    
+    free(visited);
+    free(on_statck);
+    free(edge_to);
 
-    element = list_head(graph->adjlists);
-    v->vertice = -1;
-
-    return cylce(graph, element, v, visited, parent);
+    return retval; 
 }

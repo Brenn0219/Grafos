@@ -33,7 +33,7 @@ void destroy(void *data) {
 /// @brief Constroi um grafo ralicionando os vertive v e w. A construcao e feita aparti de uma leitura de um arquivo passando o caminho na variavel path. O arquivo tem que contar o total de vertice, total de aresta, seus relacionamentos e por fim o grafico ja tem que esta inicializado com a funcao graph_init. Complexidade - O(V+E)
 /// @param graph ponteiro para um grafo
 /// @param path caminho de um arquivo que contem os relacionamentos de um 
-int graph_build(Graph *graph, const char *path) {
+int build_graph(Graph *graph, const char *path) {
     FILE *file = fopen(path, "r");
     int v_count, e_count, v, w, weight;
     
@@ -64,32 +64,20 @@ int graph_build(Graph *graph, const char *path) {
 } 
 
 int main() {
+    Graph graph;
     Stack stack;   
-    Vertex v, *w;
-    int size;
+    char *path = "data/graph-test.txt";
 
-    stack_init(&stack, sizeof(Vertex), destroy);
+    graph_init(&graph, sizeof(Vertex), macth, destroy);
+    build_graph(&graph, path);
 
-    for (int i = 1; i < 11; i++) {
-        v.vertice = i;
-        stack_push(&stack, (void *) &v);
+    if (graph_has_cycle(&graph, &stack)) {
+         for (Cell *i = list_head(&stack); i != NULL; i = list_next(i))
+            printf("%d - ", ((Vertex *) list_data(i))->vertice);
+        printf("\n");
     }
-    
-    for (Cell *i = list_head(&stack); i != NULL; i = list_next(i))
-        printf("%d - ", ((Vertex *) list_data(i))->vertice);
-    printf("\n");
 
-    for (int i = 0; i < 3; i++)
-        stack_pop(&stack);
-
-    for (Cell *i = list_head(&stack); i != NULL; i = list_next(i))
-        printf("%d - ", ((Vertex *) list_data(i))->vertice);
-    printf("\n");
-    
-    w = (Vertex *) stack_peek(&stack);
-    size = stack_size(&stack);
-    printf("size: %d\n", size);
-
+    graph_destroy(&graph);
     stack_destroy(&stack);
 
     return 0;

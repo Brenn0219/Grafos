@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include "list.h"
+#include "stack.h"
 
 /// @brief Estrutura de dados Grafos, são compostos por dois tipos de elementos: vértices e arestas. Vértices representam objetos, e as bordas estabelecem relacionamentos ou conexões entre os objetos
 typedef struct Graph {
@@ -90,7 +91,9 @@ void* graph_vertex_search(const Graph *graph, const void *data);
 
 /// @brief 
 /// @param graph 
-int graph_has_cycle(Graph *graph);
+/// @param stack 
+/// @return 
+int graph_has_cycle(Graph *graph, Stack *stack);
 
 // Macro que retorna a lista encadeada utilizada no grafo
 #define graph_adjlists(graph) ((graph)->adjlists)
