@@ -196,23 +196,23 @@ static int cylce(Graph *graph, void *element, bool *visited, int *edge_to, bool 
     graph_adjlist(graph, element, &adjlist);
     v = adjlist->vertex;
 
-    visited[((Vertex *) v)->vertice] = true;
-    on_stack[((Vertex *) v)->vertice] = true;
+    visited[((WeightedVertex *) v)->vertice] = true;
+    on_stack[((WeightedVertex *) v)->vertice] = true;
     
     for (Cell *current = list_head(adjlist->adjacent); current != NULL; current = list_next(current)) {
         w = list_data(current);
     
-        if (!visited[((Vertex *) w)->vertice]) {
-            edge_to[((Vertex *) w)->vertice] = ((Vertex *) v)->vertice;
+        if (!visited[((WeightedVertex *) w)->vertice]) {
+            edge_to[((WeightedVertex *) w)->vertice] = ((WeightedVertex *) v)->vertice;
             return cylce(graph, w, visited, edge_to, on_stack, stack);
-        } else if (on_stack[((Vertex *) w)->vertice]) {
+        } else if (on_stack[((WeightedVertex *) w)->vertice]) {
             void *cycle_vertex = v;
             stack_init(stack, graph_structure_size(graph), graph->destroy);
             
             while (graph->match(cycle_vertex, w) != 0) {
                 if (stack_push(stack, cycle_vertex))
                     return -1;
-                ((Vertex *) cycle_vertex)->vertice = edge_to[((Vertex *) cycle_vertex)->vertice];
+                ((WeightedVertex *) cycle_vertex)->vertice = edge_to[((WeightedVertex *) cycle_vertex)->vertice];
             }
             if (stack_push(stack, w))
                 return -1;
@@ -221,8 +221,8 @@ static int cylce(Graph *graph, void *element, bool *visited, int *edge_to, bool 
         }
     }
 
-    on_stack[((Vertex *) v)->vertice] = false;
-    visited[((Vertex *) v)->vertice] = true;
+    on_stack[((WeightedVertex *) v)->vertice] = false;
+    visited[((WeightedVertex *) v)->vertice] = true;
 
     return retval;
 }
@@ -244,7 +244,7 @@ int graph_has_cycle(Graph *graph, Stack *stack) {
         
         if (retval == -1)
             perror("Error insertion Stack\n");
-        else 
+        else if (retval == 1)
             break;
     }
     
