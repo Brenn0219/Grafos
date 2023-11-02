@@ -23,45 +23,46 @@ static int check_vertex_cycle(const Graph *graph, const Stack *stack, const void
 /// @param spanning_aborescence 
 /// @return 
 static int contract_cycle(Graph *graph, Stack *stack, Graph *spanning_aborescence) {
-    AdjList *new_vertex;
+    AdjList new_vertex;
     
     // inicializa o novo grafo
     graph_init(spanning_aborescence, graph_structure_size(graph), graph->match, graph->destroy);
-    
+
     // novo vertice fica identificado com o primeiro da stack (ciclo)
-    memcpy(new_vertex->vertex, list_head(stack)->data, list_structure_size(stack));
-    
-    // inserir todos os vertices que nao estao no ciclo
-    for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        if ((list_search(stack, ((AdjList *) list_data(element))->vertex) == NULL) && graph_insert_vertex(spanning_aborescence, ((AdjList *) list_data(element))->vertex) == -1)
-            return -1;
-    }
-    if (graph_insert_vertex(spanning_aborescence, new_vertex->vertex) == -1)
+    new_vertex.vertex = list_data(list_head(stack));
+
+    if (graph_insert_vertex(spanning_aborescence, new_vertex.vertex) == -1)
         return -1;
-    
-    // inseirir arestas - O(n³)
-    void *v, *w;
-    Cell *prev = NULL;
 
+    // inserir os vertices no grafo ignorando os do ciclo  
+    int v_cycle = 0, w_cycle = 0;
+    void *u = NULL, *p = NULL; 
     for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        v = list_search(stack, ((AdjList *) list_data(element))->vertex);
+        u = ((AdjList *) list_data(element))->vertex;
+        p = list_data(list_head(((AdjList *) list_data(element))->adjacent));
 
-        for (Cell *i = list_head(((AdjList *) list_data(element))->adjacent); i != NULL; i = list_next(i)) {
-            w = list_search(stack, ((AdjList *) list_data(i))->vertex);
+        v_cycle = check_vertex_cycle(graph, stack, u);
+        w_cycle = check_vertex_cycle(graph, stack, p);
+        
+        if (!v_cycle && !w_cycle) {
+            if (graph_insert_vertex(spanning_aborescence, u) == -1)
+                return -1;
 
-            if (v == NULL && w != NULL) {
-                if (prev != NULL) {
-                    ((WeightedVertex *) w)->weight = ((WeightedVertex *) w)->weight - ((WeightedVertex *) ((AdjList *) list_data(prev))->vertex)->weight;
-                    graph_insert_edge(spanning_aborescence, ((AdjList *) v)->vertex, w);
-                }
-            }
+            if (graph_insert_vertex(spanning_aborescence, p) == -1)
+                return -1;
 
-            prev = element;
+            if (graph_insert_edge(spanning_aborescence, u, p) == -1)
+                return -1;
+        } else if (!v_cycle && w_cycle) {
+            if (graph_insert_vertex(spanning_aborescence, u) == -1)
+                return -1;
+
+            if (graph_insert_edge(spanning_aborescence, u, new_vertex.vertex) == -1)
+                return -1;
         }
     }
-    
-    graph_destroy(graph);
-    free(graph);
+
+    print_graph(spanning_aborescence);
 
     return 0;
 }
