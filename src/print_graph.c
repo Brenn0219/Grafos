@@ -8,7 +8,7 @@ void print_graph(Graph *graph) {
         printf("%d: ", ((WeightedVertex *)(((AdjList *) list_data(element))->vertex))->vertice);
 
         for(Cell *i = list_head(((AdjList *) list_data(element))->adjacent); i != NULL; i = list_next(i))
-            printf("%d - ", ((WeightedVertex *)(i->data))->vertice);
+            printf("%d - ", ((WeightedVertex *)(list_data(i)))->vertice);
         printf("\n");
     }
 }
