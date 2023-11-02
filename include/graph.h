@@ -89,12 +89,6 @@ int graph_adjlist(const Graph *graph, const void *data, AdjList **adjlist);
 /// @return retorna um ponteiro para o vertice do grafico
 void* graph_vertex_search(const Graph *graph, const void *data);
 
-/// @brief 
-/// @param graph 
-/// @param stack 
-/// @return 
-int graph_has_cycle(Graph *graph, Stack *stack);
-
 // Macro que retorna a lista encadeada utilizada no grafo
 #define graph_adjlists(graph) ((graph)->adjlists)
 // Macro que retorna o valor da estrutura que ira ser utilizada na lista do grafo

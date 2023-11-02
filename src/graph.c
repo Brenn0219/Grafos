@@ -5,6 +5,7 @@
 #include "../include/graph.h"
 #include "../include/list.h"
 #include "../include/stack.h"
+#include "cycle.h"
 
 void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key), void (*destroy) (void *data)) {
     graph->vcount = 0;
@@ -186,71 +187,4 @@ void* graph_vertex_search(const Graph *graph, const void *data) {
     }
 
     return NULL;
-}
-
-static int cylce(Graph *graph, void *element, bool *visited, int *edge_to, bool *on_stack, Stack *stack) {
-    AdjList *adjlist;
-    void *v, *w;
-    int retval = 0;
-
-    graph_adjlist(graph, element, &adjlist);
-    v = adjlist->vertex;
-
-    visited[((WeightedVertex *) v)->vertice] = true;
-    on_stack[((WeightedVertex *) v)->vertice] = true;
-    
-    for (Cell *current = list_head(adjlist->adjacent); current != NULL; current = list_next(current)) {
-        w = list_data(current);
-    
-        if (!visited[((WeightedVertex *) w)->vertice]) {
-            edge_to[((WeightedVertex *) w)->vertice] = ((WeightedVertex *) v)->vertice;
-            return cylce(graph, w, visited, edge_to, on_stack, stack);
-        } else if (on_stack[((WeightedVertex *) w)->vertice]) {
-            void *cycle_vertex = v;
-            stack_init(stack, graph_structure_size(graph), graph->destroy);
-            
-            while (graph->match(cycle_vertex, w) != 0) {
-                if (stack_push(stack, cycle_vertex))
-                    return -1;
-                ((WeightedVertex *) cycle_vertex)->vertice = edge_to[((WeightedVertex *) cycle_vertex)->vertice];
-            }
-            if (stack_push(stack, w))
-                return -1;
-            
-            return 1;
-        }
-    }
-
-    on_stack[((WeightedVertex *) v)->vertice] = false;
-    visited[((WeightedVertex *) v)->vertice] = true;
-
-    return retval;
-}
-
-int graph_has_cycle(Graph *graph, Stack *stack) {
-    int n = graph->vcount + 1, retval = 0;
-    int *edge_to = (int *) malloc(sizeof(int) * n);
-    bool *visited = (bool *) malloc(sizeof(bool) * n),
-        *on_statck = (bool *) malloc(sizeof(bool) * n);
-
-    for (int i = 1; i < n; i++) {
-        edge_to[i] = 0;
-        visited[i] = false;
-        on_statck[i] = false;
-    }
-    
-    for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        retval = cylce(graph, ((AdjList *) list_data(element))->vertex, visited, edge_to, on_statck, stack);
-        
-        if (retval == -1)
-            perror("Error insertion Stack\n");
-        else if (retval == 1)
-            break;
-    }
-    
-    free(visited);
-    free(on_statck);
-    free(edge_to);
-
-    return retval; 
 }
