@@ -72,15 +72,14 @@ int comparison_weights(const void * v, const void *w) {
     WeightedVertex *first_key = (WeightedVertex *) (v);
     WeightedVertex *second_key = (WeightedVertex *) (w);
 
-    if (first_key->weight > second_key->weight)
+    if (first_key->weight < second_key->weight)
         return 1;
-    else if (first_key->weight == second_key->weight)
-        return 0;
+    
+    return 0;
 }
 
 int main() {
     Graph graph;
-    Stack stack;   
     char *path = "data/graph-test.txt";
 
     graph_init(&graph, sizeof(WeightedVertex), macth, destroy);
@@ -92,7 +91,6 @@ int main() {
     edmonds(&graph, (void *) &root, spanning_aborescence, comparison_weights);
     
     graph_destroy(&graph);
-    stack_destroy(&stack);
-
+    
     return 0;
 }

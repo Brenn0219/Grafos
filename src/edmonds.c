@@ -1,6 +1,7 @@
-#include "../include/edmonds.h"
 #include <memory.h>
 #include <stdbool.h>
+#include "../include/edmonds.h"
+#include "../include/print_graph.h"
 
 /// @brief 
 /// @param graph 
@@ -60,44 +61,39 @@ static int contract_cycle(Graph *graph, Stack *stack, Graph *spanning_aborescenc
 /// @param comparison_weights 
 /// @return 
 static int edmonds_main(Graph *graph, const void *root, Graph *spanning_aborescence, int (*comparison_weights) (const void* v, const void *w)) {
-    AdjList *element;
     Stack stack;
-    graph_adjlist(graph, root, &element);
 
-    while (element != NULL) {
-        AdjList smaller;
-        Cell *v = list_head(element->adjacent);
-        
-        for (Cell *w = list_next(v); w != NULL; w = list_next(w)) {            
-            if (comparison_weights(list_data(v), list_data(w)))
-                smaller.vertex = v->data;
+    for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
+        void *smaller = NULL;
+        Cell *v = NULL;
 
-            list_next(v);
+        for (Cell *w = list_head(((AdjList *) list_data(element))->adjacent); w != NULL; w = list_next(w)) {
+            if (v == NULL)
+                smaller = list_data(w);
+            else if (comparison_weights(list_data(v), list_data(w)))
+                smaller = list_data(v);
         }
         
-        if (smaller.vertex == NULL)
+        if (smaller == NULL)
+            return -1;
+        if (graph_insert_vertex(spanning_aborescence, ((AdjList *) list_data(element))->vertex) == -1)
             return -1;
         
-        if (graph_insert_vertex(spanning_aborescence, element->vertex) == -1)
+        if (graph_insert_vertex(spanning_aborescence, smaller) == -1)
             return -1;
         
-        if (graph_insert_vertex(spanning_aborescence, smaller.vertex) == -1)
+        if (graph_insert_edge(spanning_aborescence, ((AdjList *) list_data(element))->vertex ,smaller) == -1)
             return -1;
-        
-        if (graph_insert_edge(spanning_aborescence, element->vertex ,smaller.vertex) == -1)
-            return -1;
-        
-        element = graph_vertex_search(graph, (void *) &smaller);
     }
-    
-    int retval = graph_has_cycle(spanning_aborescence, &stack);
-    if (retval || retval != -1) {
-        Graph *new_graph = (Graph *) malloc(sizeof(Graph));
-        contract_cycle(spanning_aborescence, &stack, graph);
-        spanning_aborescence = new_graph;
-    } else {
+
+    // int retval = graph_has_cycle(spanning_aborescence, &stack);
+    // if (retval || retval != -1) {
+    //     Graph *new_graph = (Graph *) malloc(sizeof(Graph));
+    //     contract_cycle(spanning_aborescence, &stack, graph);
+    //     spanning_aborescence = new_graph;
+    // } else {
         
-    }
+    // }
 }
 
 /// @brief 
