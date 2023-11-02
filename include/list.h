@@ -46,12 +46,6 @@ int list_insert(List *list, Cell *element, const void *data);
 /// @param data elemento a ser removido
 /// @return 0 se a remocao do elemento for bem sucedidade ou -1 caso contrario
 int list_remove(List *list, Cell *element);
-
-/// @brief Pesquisa um elemento na lista encadeada
-/// @param list pointer para uma lista encadeada
-/// @param data corresponde o dado que estamos pesquisando
-/// @return NULL caso o elemento nao for encontrado; retorne a celula caso o elemento for encontrado
-Cell* list_search(List *list, const void *data);
  
 /// @brief Ordena a lista em cadeada. Utiliza a ordenacao de Selecao O(n²). * Futura Melhoria *
 /// @param list ponteiro para uma lista encadeada 

@@ -91,12 +91,3 @@ int list_remove(List *list, Cell *element) {
 
     return 0;
 }
-
-Cell* list_search(List *list, const void *data) {
-    for(Cell *i = list_head(list); i != NULL; i = list_next(i)) {
-        if(!memcmp(data, list_data(i), list_structure_size(list))) 
-            return i;
-    }
-
-    return NULL;
-}
