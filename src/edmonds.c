@@ -5,6 +5,20 @@
 
 /// @brief 
 /// @param graph 
+/// @param v 
+/// @param w 
+/// @return 
+static int check_vertex_cycle(const Graph *graph, const Stack *stack, const void *vertex) {
+    for (Cell *element = list_head(stack); element != NULL; element = list_next(element)) {
+        if (graph->match(list_data(element), vertex) == 0)
+            return 1;
+    }
+
+    return  0;
+}
+
+/// @brief 
+/// @param graph 
 /// @param stack 
 /// @param spanning_aborescence 
 /// @return 
@@ -22,7 +36,6 @@ static int contract_cycle(Graph *graph, Stack *stack, Graph *spanning_aborescenc
         if ((list_search(stack, ((AdjList *) list_data(element))->vertex) == NULL) && graph_insert_vertex(spanning_aborescence, ((AdjList *) list_data(element))->vertex) == -1)
             return -1;
     }
-    
     if (graph_insert_vertex(spanning_aborescence, new_vertex->vertex) == -1)
         return -1;
     
@@ -41,13 +54,12 @@ static int contract_cycle(Graph *graph, Stack *stack, Graph *spanning_aborescenc
                     ((WeightedVertex *) w)->weight = ((WeightedVertex *) w)->weight - ((WeightedVertex *) ((AdjList *) list_data(prev))->vertex)->weight;
                     graph_insert_edge(spanning_aborescence, ((AdjList *) v)->vertex, w);
                 }
-            } else
-                graph_insert_edge(spanning_aborescence, ((AdjList *) v)->vertex, ((AdjList *) w)->vertex);
+            }
+
+            prev = element;
         }
-
-        prev = element;
     }
-
+    
     graph_destroy(graph);
     free(graph);
 
@@ -86,14 +98,14 @@ static int edmonds_main(Graph *graph, const void *root, Graph *spanning_aboresce
             return -1;
     }
 
-    // int retval = graph_has_cycle(spanning_aborescence, &stack);
-    // if (retval || retval != -1) {
-    //     Graph *new_graph = (Graph *) malloc(sizeof(Graph));
-    //     contract_cycle(spanning_aborescence, &stack, graph);
-    //     spanning_aborescence = new_graph;
-    // } else {
+    int retval = graph_has_cycle(spanning_aborescence, &stack);
+    if (retval || retval != -1) {
+        Graph *new_graph = (Graph *) malloc(sizeof(Graph));
         
-    // }
+        contract_cycle(spanning_aborescence, &stack, new_graph);
+
+        spanning_aborescence = new_graph;
+    } 
 }
 
 /// @brief 
