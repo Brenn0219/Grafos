@@ -3,7 +3,6 @@
 #include "../include/edmonds.h"
 #include "../include/graph.h"
 #include "../include/print_graph.h"
-#include "../include/cycle.h"
 
 /// @brief 
 /// @param graph 
@@ -69,6 +68,66 @@ static int contract_cycle(Graph *graph, Stack *stack, Graph *spanning_aborescenc
 }
 
 /// @brief 
+/// @param x 
+/// @param y 
+/// @return 
+int compare_integer(const void *x, const void* y) {
+    if (!memcmp(x, y, sizeof(int)))
+        return 1;
+    return 0;
+}
+
+/// @brief 
+/// @param parents 
+/// @param index 
+/// @param stack 
+/// @return 
+static int cycle(const int* parents, const int index, Stack *stack) {
+    Stack aux;
+    int father;
+
+    stack_init(&aux, sizeof(int), compare_integer, NULL);
+    stack_push(&aux, (void *) &index);
+
+    father = parents[index];
+    while (father != 0) {
+        if (stack_search(&aux, (void *) &father)) {
+            while (!compare_integer(&father, stack_peek(&aux))) {
+                stack_push(stack, stack_peek(&aux));
+                stack_pop(&aux);
+            }
+
+            stack_push(stack, &father);
+
+            return 1;
+        } else {
+            stack_push(&aux, &father);
+            father = parents[father];
+        }
+    }
+    
+    return 0;
+}
+
+/// @brief 
+/// @param n 
+/// @param parents 
+/// @param stack 
+/// @return 
+static int discover_cycle(const int n, const int* parents, Stack *stack) {
+    int retval = 0;
+
+    stack_init(stack, sizeof(int), compare_integer, NULL);
+
+    for (int i = 1; i < n; i++) {
+        if ((retval = cycle(parents, i, stack)))
+            break;
+    }
+
+    return retval; 
+}
+
+/// @brief 
 /// @param graph 
 /// @param weights 
 /// @param v_min 
@@ -105,17 +164,23 @@ static int edmonds_main(Graph *graph, Graph *spanning_aborescence, int (*compari
 
     memset((void *) weights, 0, sizeof(int) * n);
     memset((void *) v_min, 0, sizeof(int) * n);
+    stack_init(&stack, sizeof(int), compare_integer, NULL);
 
     find_min_parents(graph, weights, v_min);
+    discover_cycle(n, v_min, &stack);
+    
+    // for (Cell *element = list_head(&stack); element != NULL; element = list_next(element)) 
+    //     printf("%d - ", *((int *) list_data(element)));
+    // printf("\n");
 
-    int retval = graph_has_cycle(spanning_aborescence, &stack);
-    if (retval || retval != -1) {
-        Graph *new_graph = (Graph *) malloc(sizeof(Graph));
+    // int retval = graph_has_cycle(spanning_aborescence, &stack);
+    // if (retval || retval != -1) {
+    //     Graph *new_graph = (Graph *) malloc(sizeof(Graph));
         
-        contract_cycle(spanning_aborescence, &stack, new_graph);
+    //     contract_cycle(spanning_aborescence, &stack, new_graph);
 
-        spanning_aborescence = new_graph;
-    }
+    //     spanning_aborescence = new_graph;
+    // }
 }
 
 /// @brief 
