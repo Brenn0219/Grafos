@@ -16,7 +16,7 @@ void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *f
     graph->destroy = destroy;
 
     graph->adjlists = (List *) malloc(sizeof(List));
-    list_init(graph->adjlists, sizeof(AdjList), NULL);
+    list_init(graph->adjlists, sizeof(AdjList), NULL, NULL);
 }
 
 void graph_destroy(Graph *graph) {
@@ -57,7 +57,7 @@ int graph_insert_vertex(Graph *graph, const void *data) {
     adjlist->vertex = (void *) malloc(graph_structure_size(graph));
     memcpy(adjlist->vertex, data, graph_structure_size(graph));
 
-    list_init(adjlist->adjacent, graph_structure_size(graph), graph->destroy);
+    list_init(adjlist->adjacent, graph_structure_size(graph), graph->match, graph->destroy);
     if ((retval = list_insert(graph->adjlists, list_tail(graph->adjlists), adjlist)) != 0) 
         return retval;
     

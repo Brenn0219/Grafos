@@ -21,7 +21,7 @@ typedef struct List {
 /// @brief Inicializa uma lista encadeada na qual size e definido como 0, o metodo para destruir a lista, e os ponteiros head e final para NULL. A complexidade de tempo de execucao desta funcao e O(1) porque todas as etapas na inicializacao de uma lista encadeada sao executadas em tempo constante.
 /// @param list ponteiro para uma lista encadeada
 /// @param destroy ponteiro para a funcao que fornece uma maneira de liberar dados alocados dinamicamente
-void list_init(List *list, size_t structure_size, void (*destroy)(void *data));
+void list_init(List *list, size_t structure_size, int (*match) (const void *first_key, const void *second_key), void (*destroy)(void *data));
 
 /// @brief Destroy fornece uma maneira de liberar dados alocados dinamicamente, se a lista contiver dados alocado dinamicamente usando malloc, destroy deve ser definido como free para liberar os dados como a lista encadeada está destruído. Para dados estruturados contendo vários membros alocados dinamicamente, destrua deve ser definido como uma função definida pelo usuário que também chama free para cada membro alocado dinamicamente quanto à própria estrutura. Para uma lista encadeada contendo dados que não devem ser liberados, destruir deve ser definido como NULL. Complexidade - O(n)
 /// @param list ponteiro para uma lista encadeada 

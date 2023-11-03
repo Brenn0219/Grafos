@@ -3,9 +3,10 @@
 #include <memory.h>
 #include "../include/list.h"
 
-void list_init(List *list, size_t structure_size, void (* destroy) (void *data)) {
+void list_init(List *list, size_t structure_size, int (*match) (const void *first_key, const void *second_key), void (* destroy) (void *data)) {
     list->size = 0;
     list->structure_size = structure_size;
+    list->match = match;
     list->destroy = destroy;
     list->head = NULL;
     list->tail = NULL;

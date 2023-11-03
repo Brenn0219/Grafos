@@ -39,7 +39,7 @@ int dfs(Graph *graph, List *ordered) {
         vertex->color = WHITE;
     }
 
-    list_init(ordered, graph_structure_size(graph), NULL);
+    list_init(ordered, graph_structure_size(graph), graph->match, graph->destroy);
 
     for (element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
         vertex = ((AdjList *) list_data(element))->vertex;
