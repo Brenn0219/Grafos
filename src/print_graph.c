@@ -2,13 +2,17 @@
 #include "../include/graph.h"
 #include "../include/list.h"
 
-void print_graph(Graph *graph) {
+void print_graph(const Graph *graph, void (* print) (const void *v)) {
     
-    for(Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        printf("%d: ", ((WeightedVertex *)(((AdjList *) list_data(element))->vertex))->vertice);
+    for(Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
+        const AdjList *adjlist = (AdjList *) list_data(v);
+        printf("%d - ", vertex_data((VertexWeight *) adjlist->vertex));
 
-        for(Cell *i = list_head(((AdjList *) list_data(element))->adjacent); i != NULL; i = list_next(i))
-            printf("%d - ", ((WeightedVertex *)(list_data(i)))->vertice);
+        for(Cell *i = list_head(adjlist->adjacent); i != NULL; i = list_next(i)) {
+            print(list_data(i));
+            printf(" - ");
+        }
+
         printf("\n");
     }
 }
