@@ -14,12 +14,12 @@
 /// @param structure_size tamanho das estruturas para comparacao
 /// @return 1 se for igual, 0 se forem diferentes e -1 ser for nulas
 int macth(const void *first_key, const void *second_key) {
-    WeightedVertex *v = (WeightedVertex *) (first_key);
-    WeightedVertex *w = (WeightedVertex *) (second_key);
+    VertexWeight *v = (VertexWeight *) (first_key);
+    VertexWeight *w = (VertexWeight *) (second_key);
 
-    if (v->vertice > w->vertice) 
+    if (v->data > w->data) 
         return 1;
-    else if (v->vertice == w->vertice)
+    else if (v->data == w->data)
         return 0;
     else 
         return -1;
@@ -47,10 +47,10 @@ int build_graph(Graph *graph, const char *path) {
         
     for(int i = 0; i < e_count; i++) {
         if (fscanf(file, "%d %d %d", &v, &w, &weight) != EOF) {
-            WeightedVertex v_vertex, w_vertex;
+            VertexWeight v_vertex, w_vertex;
             
-            v_vertex.vertice = v;
-            w_vertex.vertice = w;
+            v_vertex.data = v;
+            w_vertex.data = w;
             v_vertex.weight = -1;
             w_vertex.weight = weight;
 
@@ -64,32 +64,17 @@ int build_graph(Graph *graph, const char *path) {
     fclose(file);
 } 
 
-/// @brief 
-/// @param v 
-/// @param w 
-/// @return 
-int comparison_weights(const void * v, const void *w) {
-    WeightedVertex *first_key = (WeightedVertex *) (v);
-    WeightedVertex *second_key = (WeightedVertex *) (w);
-
-    if (first_key->weight < second_key->weight)
-        return 1;
-    
-    return 0;
-}
-
 int main() {
     Graph graph;
     char *path = "data/graph-test.txt";
 
-    graph_init(&graph, sizeof(WeightedVertex), macth, destroy);
+    graph_init(&graph, sizeof(VertexWeight), macth, destroy);
     build_graph(&graph, path);
 
     Graph *spanning_aborescence = (Graph *) malloc(sizeof(Graph));
-    WeightedVertex root;
-    root.vertice = 5;
-    edmonds(&graph, (void *) &root, spanning_aborescence, comparison_weights);
+    edmonds(&graph, spanning_aborescence, vertex_comparison_weights);
     
+    print_graph(&graph, vertex_print);
     graph_destroy(&graph);
     
     return 0;
