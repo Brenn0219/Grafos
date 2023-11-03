@@ -5,15 +5,13 @@
 
 static int dfs_main(Graph *graph, AdjList *adjlist, List *ordered) {
     AdjList *clr_adjlist;
-    DfsVertex *clr_vertex, *adj_vertex;
+    DfsVertex *clr_vertex;
     Cell *member;
 
     ((DfsVertex *) adjlist->vertex)->color = GRAY;
 
     for (member = list_head(adjlist->adjacent); member != NULL; member = list_next(member)) {
-        adj_vertex = list_data(member);
-
-        if (graph_adjlist(graph, adj_vertex, &clr_adjlist) != 0)
+        if (graph_adjlist(graph, list_data(member), &clr_adjlist) != 0)
             return -1;
 
         clr_vertex = clr_adjlist->vertex;
