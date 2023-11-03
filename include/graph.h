@@ -1,7 +1,9 @@
 #pragma once
+
 #include <stdio.h>
 #include "list.h"
 #include "stack.h"
+#include "vertex.h"
 
 /// @brief Estrutura de dados Grafos, são compostos por dois tipos de elementos: vértices e arestas. Vértices representam objetos, e as bordas estabelecem relacionamentos ou conexões entre os objetos
 typedef struct Graph {
@@ -20,24 +22,6 @@ typedef struct AdjList {
     void *vertex;
     List *adjacent;
 } AdjList;
-
-/// @brief Estrutura de Vertice usada nas pesquisas dfs e bfs
-typedef enum VertexColor {
-    WHITE, 
-    GRAY, 
-    BLACK
-} VertexColor;
-
-/// @brief Estrutura de Vertice no grafo
-typedef struct Vertex {
-    int vertice;
-} Vertex;
-
-/// @brief Estrutura de Vertices que cada lista adjacente tem um vertice com peso. ex: v - w, w armazena o peso desta relacao
-typedef struct WeightedVertex {
-    int vertice;
-    int weight;
-} WeightedVertex;
 
 /// @brief Inicializa o grafico especificado por graph. Esta operacao deve ser chamada para um grafico antes que o grafico possa ser usado com qualquer outra operacao. O argumento match e uma funcao usada por varias operacaoes graficas para determinar se dois vertices correspondem. Deve retornar 1 se first_key for igual second_key e caso contrario. O argumento destroy fornece uma maneira de liberar dados alocados dinamicamente quando graph_destroy e chamado graph_destroy. Para por exemplo, se o gráfico contiver dados alocados dinamicamente usando malloc, destroy devera ser definido como free para libere os dados enquanto o gráfico é destruído. Para dados estruturados contendo vários alocados dinamicamente membros, destroy deve ser definido como uma funçao definida pelo usuario que chama free para cada membro alocado dinamicamente. membro, bem como para a propria estrutura. Para um grafico contendo dados que não devem ser liberados, destrua deve ser definido como NULL. Complexidade - O(1)
 /// @param graph ponteiro para um grafo

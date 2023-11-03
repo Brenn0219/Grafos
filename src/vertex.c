@@ -2,12 +2,12 @@
 #include "../include/vertex.h"
 
 void vertex_print(const void *v) {
-    printf("%d(%d)", vertex_data((VertexWeight *) v), vertex_weight((VertexWeight *) v));
+    printf("%d(%d)", vertex_data(v), vertex_weight(v));
 }
 
 int vertex_comparison_weights(const void *v, const void *w) {
-    int v_weight = vertex_weight((VertexWeight *) v);
-    int w_weight = vertex_weight((VertexWeight *) w);
+    int v_weight = vertex_weight(v);
+    int w_weight = vertex_weight(w);
 
     if (v > w)
         return 1;

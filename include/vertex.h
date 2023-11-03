@@ -25,5 +25,5 @@ void vertex_print(const void *v);
 /// @return 1 se v > w, 0 se v == w e -1 se v < w 
 int vertex_comparison_weights(const void *v, const void *w);
 
-#define vertex_data(v) ((v)->data)
-#define vertex_weight(v) ((v)->weight)
+#define vertex_data(v) (((VertexWeight *) v)->data)
+#define vertex_weight(v) (((VertexWeight *) v)->weight)
