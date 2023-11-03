@@ -100,29 +100,13 @@ static int find_min_parents(const Graph *graph, int *weights, int *v_min) {
 /// @return 
 static int edmonds_main(Graph *graph, Graph *spanning_aborescence, int (*comparison_weights) (const void* v, const void *w)) {
     Stack stack;
+    int n = graph->vcount + 1;
+    int weights[n], v_min[n];
 
-    for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        void *smaller = NULL;
-        Cell *v = NULL;
+    memset((void *) weights, 0, sizeof(int) * n);
+    memset((void *) v_min, 0, sizeof(int) * n);
 
-        for (Cell *w = list_head(((AdjList *) list_data(element))->adjacent); w != NULL; w = list_next(w)) {
-            if (v == NULL)
-                smaller = list_data(w);
-            else if (comparison_weights(list_data(v), list_data(w)))
-                smaller = list_data(v);
-        }
-        
-        if (smaller == NULL)
-            return -1;
-        if (graph_insert_vertex(spanning_aborescence, ((AdjList *) list_data(element))->vertex) == -1)
-            return -1;
-        
-        if (graph_insert_vertex(spanning_aborescence, smaller) == -1)
-            return -1;
-        
-        if (graph_insert_edge(spanning_aborescence, ((AdjList *) list_data(element))->vertex ,smaller) == -1)
-            return -1;
-    }
+    find_min_parents(graph, weights, v_min);
 
     int retval = graph_has_cycle(spanning_aborescence, &stack);
     if (retval || retval != -1) {

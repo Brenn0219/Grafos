@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "../include/cycle.h"
+#include "../include/vertex.h"
 
 /// @brief 
 /// @param list 
@@ -32,25 +33,25 @@ static int cycle(Graph *graph, void *element, bool *visited, int *edge_to, bool 
     graph_adjlist(graph, element, &adjlist);
     v = adjlist->vertex;
 
-    visited[((WeightedVertex *) v)->vertice] = true;
-    on_stack[((WeightedVertex *) v)->vertice] = true;
+    visited[vertex_data(v)] = true;
+    on_stack[vertex_data(v)] = true;
     
     for (Cell *current = list_head(adjlist->adjacent); current != NULL; current = list_next(current)) {
         w = list_data(current);
     
-        if (!visited[((WeightedVertex *) w)->vertice]) {
-            edge_to[((WeightedVertex *) w)->vertice] = ((WeightedVertex *) v)->vertice;
+        if (!visited[vertex_data(w)]) {
+            edge_to[vertex_data(w)] = vertex_data(v);
             return cycle(graph, w, visited, edge_to, on_stack, stack);
-        } else if (on_stack[((WeightedVertex *) w)->vertice]) {
+        } else if (on_stack[vertex_data(w)]) {
             void *cycle_vertex = v;
-            WeightedVertex vertex_to;
+            VertexWeight vertex_to;
             Cell *father;
 
             // inicializando a lista dos vertices que pertence ao ciclo
             stack_init(stack, graph_structure_size(graph), graph->destroy);
 
             // definindo o pai do primeiro vertice do ciclo
-            vertex_to.vertice = edge_to[((WeightedVertex *) w)->vertice];
+            vertex_to.data = edge_to[vertex_data(w)];
             father = search_father(graph->adjlists, (void *) &vertex_to, graph->match);
 
             // pesquisando o vertice no grafo
@@ -66,7 +67,7 @@ static int cycle(Graph *graph, void *element, bool *visited, int *edge_to, bool 
                 if (stack_push(stack, cycle_vertex))
                     return -1;
         
-                vertex_to.vertice = edge_to[((WeightedVertex *) cycle_vertex)->vertice];
+                vertex_to.data = edge_to[vertex_data(cycle_vertex)];
                 father = search_father(graph->adjlists, (void *) &vertex_to, graph->match);
                 cycle_vertex = ((AdjList *) list_data(father))->vertex;
             }
@@ -78,8 +79,8 @@ static int cycle(Graph *graph, void *element, bool *visited, int *edge_to, bool 
         }
     }
 
-    on_stack[((WeightedVertex *) v)->vertice] = false;
-    visited[((WeightedVertex *) v)->vertice] = true;
+    on_stack[vertex_data(v)] = false;
+    visited[vertex_data(v)] = true;
 
     return retval;
 }
@@ -100,8 +101,8 @@ int graph_has_cycle(Graph *graph, Stack *stack) {
         on_statck[i] = false;
     }
     
-    for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        retval = cycle(graph, ((AdjList *) list_data(element))->vertex, visited, edge_to, on_statck, stack);
+    for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
+        retval = cycle(graph, ((AdjList *) list_data(v))->vertex, visited, edge_to, on_statck, stack);
         
         if (retval == -1)
             perror("Error insertion Stack\n");
