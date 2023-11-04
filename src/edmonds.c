@@ -66,47 +66,40 @@ static int expand_cycle(Graph *graph, Stack *cycle, Graph *contracted_graph, int
 /// @param spanning_aborescence 
 /// @return 
 static int contract_cycle(const Graph *graph, Stack *cycle, Graph *contracted_graph, const int *weights) {
-    VertexWeight u, w;
-    int contracted = *((int *) list_data(list_head(cycle))); 
+    int contracted_vertex = vertex_data(stack_peek(cycle));
 
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
         const AdjList *adjlist = (AdjList *) list_data(v);
 
         for (Cell *i = list_head(adjlist->adjacent); i != NULL; i = list_next(i)) {
-            if (stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && stack_search(cycle, (void *) &vertex_data(list_data(i)))) 
-                continue;    
-            else if (!stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && !stack_search(cycle, (void *) &vertex_data(list_data(i)))) {
-                u.data = vertex_data(adjlist->vertex);
-                u.weight = vertex_weight(adjlist->vertex);
+            const VertexWeight *w = (VertexWeight *) list_data(i);
 
-                w.data = vertex_data(list_data(i));
-                w.weight = vertex_weight(list_data(i));
-            } else if (stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && !stack_search(cycle, (void *) &vertex_data(list_data(i)))) {
-                u.data = contracted;
-                u.weight = vertex_weight(adjlist->vertex);
+            if (stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && stack_search(cycle, (void *) &vertex_data(w))) 
+                continue;
+            else {
+                VertexWeight u = {.data = vertex_data(adjlist->vertex), .weight = vertex_weight(adjlist->vertex)};
+                VertexWeight p = {.data = vertex_data(w), .weight = vertex_weight(w)};
 
-                w.data = vertex_data(list_data(i));
-                w.weight = vertex_weight(list_data(i));
-            } else if (!stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && stack_search(cycle, (void *) &vertex_data(list_data(i)))) {
-                u.data = vertex_data(adjlist->vertex);
-                u.weight = vertex_weight(adjlist->vertex);
+                if (!stack_search(cycle, (void *) &vertex_data(w)))
+                    u.data = contracted_vertex;
+                else if (!stack_search(cycle, (void *) &vertex_data(adjlist->vertex))) {
+                    p.data = contracted_vertex;
+                    p.weight = vertex_weight(w) - weights[vertex_weight(w)];
+                }
 
-                w.data = contracted;
-                w.weight = vertex_weight(list_data(i)) - weights[vertex_data(list_data(i))];
+                if (graph_insert_vertex(contracted_graph, (void *) &u) == -1)
+                    return -1;
+
+                if (graph_insert_vertex(contracted_graph, (void *) &p) == -1)
+                    return -1;
+
+                if (graph_insert_edge(contracted_graph, (void *) &u, (void *) &p) == -1)
+                    return -1;
             }
-
-            if (graph_insert_vertex(contracted_graph, (void *) &u) == -1)
-                return -1;
-
-            if (graph_insert_vertex(contracted_graph, (void *) &w) == -1)
-                return -1;
-
-            if (graph_insert_edge(contracted_graph, (void *) &u, (void *) &w) == -1)
-                return -1;
-        } 
+        }
     }
 
- 
+    return 0;
 }
 
 /// @brief 
