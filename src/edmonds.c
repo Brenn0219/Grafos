@@ -5,17 +5,59 @@
 #include "../include/print_graph.h"
 
 /// @brief 
-/// @param graph 
-/// @param v 
-/// @param w 
+/// @param x 
+/// @param y 
 /// @return 
-static int check_vertex_cycle(const Graph *graph, const Stack *stack, const void *vertex) {
-    for (Cell *element = list_head(stack); element != NULL; element = list_next(element)) {
-        if (graph->match(list_data(element), vertex) == 0)
-            return 1;
+static int compare_integer(const void *x, const void* y) {
+    if (!memcmp(x, y, sizeof(int)))
+        return 1;
+    return 0;
+}
+
+/// @brief 
+/// @param graph 
+/// @param cycle 
+/// @param contracted_graph 
+/// @return 
+static int expand_cycle(Graph *graph, Stack *cycle, Graph *contracted_graph, int *perents, int *weights) {
+    if (list_size(cycle) == 0)
+        return 0;
+    
+    int top = *((int *)(list_data(list_head(cycle))));
+    int edge_top = perents[top], n = graph->vcount + 1, x;
+
+    VertexWeight p = {.data = top, .weight = weights[top]};
+    VertexWeight w = {.data = edge_top, .weight = weights[edge_top]};
+
+    if (graph_remove_edge(graph, (void *) &w, (void *) &p) == -1)
+        return -1;
+    
+    perents[top] = 0;
+    weights[top] = 0;
+    
+    for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
+        const AdjList *adjlist = (AdjList *) list_data(v);
+        Cell *i = list_head(adjlist->adjacent);
+
+        while (i != NULL) {
+            if (compare_integer((void *) &perents[vertex_data(list_data(i))], (void *) &vertex_data(adjlist->vertex)) == 0) {
+                p.data = vertex_data(adjlist->vertex); 
+                p.weight = vertex_weight(adjlist->vertex);
+                w.data = vertex_data(list_data(i));
+                w.weight = vertex_weight(list_data(i));
+
+                i = list_next(i);
+                
+                if (graph_remove_edge(graph, (void *) &p, (void *) &w) == -1)
+                    return -1;
+            } else
+                i = list_next(i);
+        }
     }
 
-    return  0;
+    printf("\n===========================================================\n");
+    printf("graph caminho minimo\n");
+    print_graph(graph, vertex_print);
 }
 
 /// @brief 
@@ -23,58 +65,48 @@ static int check_vertex_cycle(const Graph *graph, const Stack *stack, const void
 /// @param stack 
 /// @param spanning_aborescence 
 /// @return 
-static int contract_cycle(Graph *graph, Stack *stack, Graph *spanning_aborescence) {
-    AdjList new_vertex;
-    
-    // inicializa o novo grafo
-    graph_init(spanning_aborescence, graph_structure_size(graph), graph->match, graph->destroy);
+static int contract_cycle(const Graph *graph, Stack *cycle, Graph *contracted_graph, const int *weights) {
+    VertexWeight u, w;
+    int contracted = *((int *) list_data(list_head(cycle))); 
 
-    // novo vertice fica identificado com o primeiro da stack (ciclo)
-    new_vertex.vertex = list_data(list_head(stack));
-    if (graph_insert_vertex(spanning_aborescence, new_vertex.vertex) == -1)
-        return -1;
+    for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
+        const AdjList *adjlist = (AdjList *) list_data(v);
 
-    // inserir os vertices no grafo ignorando os do ciclo  
-    int v_cycle = 0, w_cycle = 0;
-    void *u = NULL, *p = NULL; 
-    for (Cell *element = list_head(graph->adjlists); element != NULL; element = list_next(element)) {
-        u = ((AdjList *) list_data(element))->vertex;
-        p = list_data(list_head(((AdjList *) list_data(element))->adjacent));
+        for (Cell *i = list_head(adjlist->adjacent); i != NULL; i = list_next(i)) {
+            if (stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && stack_search(cycle, (void *) &vertex_data(list_data(i)))) 
+                continue;    
+            else if (!stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && !stack_search(cycle, (void *) &vertex_data(list_data(i)))) {
+                u.data = vertex_data(adjlist->vertex);
+                u.weight = vertex_weight(adjlist->vertex);
 
-        v_cycle = check_vertex_cycle(graph, stack, u);
-        w_cycle = check_vertex_cycle(graph, stack, p);
+                w.data = vertex_data(list_data(i));
+                w.weight = vertex_weight(list_data(i));
+            } else if (stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && !stack_search(cycle, (void *) &vertex_data(list_data(i)))) {
+                u.data = contracted;
+                u.weight = vertex_weight(adjlist->vertex);
 
-        if (!v_cycle || !w_cycle) {
-            if (!v_cycle && w_cycle)  
-                p = new_vertex.vertex;
-            else if (v_cycle && !w_cycle)
-                u = new_vertex.vertex;
+                w.data = vertex_data(list_data(i));
+                w.weight = vertex_weight(list_data(i));
+            } else if (!stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && stack_search(cycle, (void *) &vertex_data(list_data(i)))) {
+                u.data = vertex_data(adjlist->vertex);
+                u.weight = vertex_weight(adjlist->vertex);
 
-            if (graph_insert_vertex(spanning_aborescence, u) == -1)
+                w.data = contracted;
+                w.weight = vertex_weight(list_data(i)) - weights[vertex_data(list_data(i))];
+            }
+
+            if (graph_insert_vertex(contracted_graph, (void *) &u) == -1)
                 return -1;
 
-            if (graph_insert_vertex(spanning_aborescence, p) == -1)
+            if (graph_insert_vertex(contracted_graph, (void *) &w) == -1)
                 return -1;
 
-            if (graph_insert_edge(spanning_aborescence, u, p) == -1)
+            if (graph_insert_edge(contracted_graph, (void *) &u, (void *) &w) == -1)
                 return -1;
-        }
+        } 
     }
 
-    graph_destroy(graph);
-    free(graph);
-
-    return 0;
-}
-
-/// @brief 
-/// @param x 
-/// @param y 
-/// @return 
-int compare_integer(const void *x, const void* y) {
-    if (!memcmp(x, y, sizeof(int)))
-        return 1;
-    return 0;
+ 
 }
 
 /// @brief 
@@ -116,11 +148,12 @@ static int cycle(const int* parents, const int index, Stack *stack) {
 /// @return 
 static int discover_cycle(const int n, const int* parents, Stack *stack) {
     int retval = 0;
-
     stack_init(stack, sizeof(int), compare_integer, NULL);
 
     for (int i = 1; i < n; i++) {
-        if ((retval = cycle(parents, i, stack)))
+        retval = cycle(parents, i, stack);
+
+        if (retval)
             break;
     }
 
@@ -155,9 +188,8 @@ static int find_min_parents(const Graph *graph, int *weights, int *v_min) {
 /// @brief 
 /// @param graph 
 /// @param spanning_aborescence 
-/// @param comparison_weights 
 /// @return 
-static int edmonds_main(Graph *graph, Graph *spanning_aborescence, int (*comparison_weights) (const void* v, const void *w)) {
+static int edmonds_main(Graph *graph, Graph *spanning_aborescence) {
     Stack stack;
     int n = graph->vcount + 1;
     int weights[n], v_min[n];
@@ -167,28 +199,25 @@ static int edmonds_main(Graph *graph, Graph *spanning_aborescence, int (*compari
     stack_init(&stack, sizeof(int), compare_integer, NULL);
 
     find_min_parents(graph, weights, v_min);
-    discover_cycle(n, v_min, &stack);
-    
-    // for (Cell *element = list_head(&stack); element != NULL; element = list_next(element)) 
-    //     printf("%d - ", *((int *) list_data(element)));
-    // printf("\n");
 
-    // int retval = graph_has_cycle(spanning_aborescence, &stack);
-    // if (retval || retval != -1) {
-    //     Graph *new_graph = (Graph *) malloc(sizeof(Graph));
-        
-    //     contract_cycle(spanning_aborescence, &stack, new_graph);
+    if (discover_cycle(n, v_min, &stack)) {
+        Graph contracted_graph, new_graph;
+        graph_init(&contracted_graph, graph_structure_size(graph), graph->match, graph->destroy);
+        graph_init(&new_graph, graph_structure_size(graph), graph->match, graph->destroy);
 
-    //     spanning_aborescence = new_graph;
-    // }
+        contract_cycle(graph, &stack, &contracted_graph, weights);
+        edmonds(&contracted_graph, &new_graph);
+    }
+
+    expand_cycle(graph, &stack, spanning_aborescence, v_min, weights);
+
+    print_graph(graph, vertex_print);
 }
 
 /// @brief 
 /// @param graph 
 /// @param spanning_aborescence 
-/// @param comparison_weights 
-void edmonds(Graph *graph, Graph *spanning_aborescence, int (*comparison_weights) (const void* v, const void *w)) {    
+void edmonds(Graph *graph, Graph *spanning_aborescence) {    
     graph_init(spanning_aborescence, graph_structure_size(graph), graph->match, graph->destroy);
-    
-    edmonds_main(graph, spanning_aborescence, comparison_weights);
+    edmonds_main(graph, spanning_aborescence);
 }

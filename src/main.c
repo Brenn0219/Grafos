@@ -47,11 +47,10 @@ int main() {
 
     graph_init(&graph, sizeof(VertexWeight), vertex_macth, vertex_destroy);
     build_graph(&graph, path);
-
-    Graph *spanning_aborescence = (Graph *) malloc(sizeof(Graph));
-    edmonds(&graph, spanning_aborescence, vertex_comparison_weights);
     
-    print_graph(&graph, vertex_print);
+    Graph *spanning_aborescence = (Graph *) malloc(sizeof(Graph));
+    edmonds(&graph, spanning_aborescence);
+    
     graph_destroy(&graph);
     
     return 0;

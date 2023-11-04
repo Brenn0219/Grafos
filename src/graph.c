@@ -5,7 +5,6 @@
 #include "../include/graph.h"
 #include "../include/list.h"
 #include "../include/stack.h"
-#include "../include/cycle.h"
 
 void graph_init(Graph *graph, size_t structure_size, int (*match) (const void *first_key, const void *second_key), void (*destroy) (void *data)) {
     graph->vcount = 0;
