@@ -19,7 +19,7 @@ static int compare_integer(const void *x, const void* y) {
 /// @param cycle 
 /// @param contracted_graph 
 /// @return 
-static int expand_cycle(Graph *graph, Stack *cycle, Graph *contracted_graph, int *perents, int *weights) {
+static int expand_cycle(Graph *graph, Graph *contracted_graph, Graph *spanning_aborescence, Stack *cycle, int *perents, int *weights) {
     if (list_size(cycle) == 0)
         return 0;
     
@@ -54,10 +54,6 @@ static int expand_cycle(Graph *graph, Stack *cycle, Graph *contracted_graph, int
                 i = list_next(i);
         }
     }
-
-    printf("\n===========================================================\n");
-    printf("graph caminho minimo\n");
-    print_graph(graph, vertex_print);
 }
 
 /// @brief 
@@ -65,7 +61,7 @@ static int expand_cycle(Graph *graph, Stack *cycle, Graph *contracted_graph, int
 /// @param stack 
 /// @param spanning_aborescence 
 /// @return 
-static int contract_cycle(const Graph *graph, Stack *cycle, Graph *contracted_graph, const int *weights) {
+static int contract_cycle(const Graph *graph, Graph *contracted_graph, Graph *spanning_aborescence, Stack *cycle, const int *weights) {
     int contracted_vertex = vertex_data(stack_peek(cycle));
 
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
@@ -80,11 +76,11 @@ static int contract_cycle(const Graph *graph, Stack *cycle, Graph *contracted_gr
                 VertexWeight u = {.data = vertex_data(adjlist->vertex), .weight = vertex_weight(adjlist->vertex)};
                 VertexWeight p = {.data = vertex_data(w), .weight = vertex_weight(w)};
 
-                if (!stack_search(cycle, (void *) &vertex_data(w)))
+                if (stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && !stack_search(cycle, (void *) &vertex_data(w)))
                     u.data = contracted_vertex;
-                else if (!stack_search(cycle, (void *) &vertex_data(adjlist->vertex))) {
+                else if (!stack_search(cycle, (void *) &vertex_data(adjlist->vertex)) && stack_search(cycle, (void *) &vertex_data(w))) {
                     p.data = contracted_vertex;
-                    p.weight = vertex_weight(w) - weights[vertex_weight(w)];
+                    p.weight = p.weight - weights[vertex_data(w)];
                 }
 
                 if (graph_insert_vertex(contracted_graph, (void *) &u) == -1)
@@ -193,18 +189,25 @@ static int edmonds_main(Graph *graph, Graph *spanning_aborescence) {
 
     find_min_parents(graph, weights, v_min);
 
+    for (int i = 1; i < n; i++) 
+        printf("i: %d | perents: %d weight: %d\n", i, v_min[i], weights[i]);
+    printf("\n");
+
     if (discover_cycle(n, v_min, &stack)) {
-        Graph contracted_graph, new_graph;
+        Graph contracted_graph;
         graph_init(&contracted_graph, graph_structure_size(graph), graph->match, graph->destroy);
-        graph_init(&new_graph, graph_structure_size(graph), graph->match, graph->destroy);
 
-        contract_cycle(graph, &stack, &contracted_graph, weights);
-        edmonds(&contracted_graph, &new_graph);
+        contract_cycle(graph, &contracted_graph, spanning_aborescence, &stack, weights);
+
+        for(Cell *element = list_head(&stack); element != NULL; element = list_next(element))
+            printf("%d - ", *((int *) list_data(element)));
+        printf("\n\n");
+        print_graph(&contracted_graph, vertex_print);
+        printf("\n=====================================\n");
+
+        edmonds_main(&contracted_graph, spanning_aborescence);
+        expand_cycle(graph, &contracted_graph, spanning_aborescence, &stack, v_min, weights);
     }
-
-    expand_cycle(graph, &stack, spanning_aborescence, v_min, weights);
-
-    print_graph(graph, vertex_print);
 }
 
 /// @brief 
@@ -212,5 +215,7 @@ static int edmonds_main(Graph *graph, Graph *spanning_aborescence) {
 /// @param spanning_aborescence 
 void edmonds(Graph *graph, Graph *spanning_aborescence) {    
     graph_init(spanning_aborescence, graph_structure_size(graph), graph->match, graph->destroy);
+    print_graph(graph, vertex_print);
+    printf("\n=====================================\n");
     edmonds_main(graph, spanning_aborescence);
 }
