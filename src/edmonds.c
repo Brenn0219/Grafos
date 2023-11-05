@@ -43,20 +43,20 @@ static int verify_edge(const Graph *graph, const void *src, void *dest)
     return 0;
 }
 
-/// @brief 
-/// @param graph 
-/// @param aborescence 
-/// @param cycle 
-/// @param n 
-/// @param perents 
-/// @param weights 
-/// @return 
-static int expand_cycle(const Graph *graph, Graph *aborescence, Stack *cycle, int n, int *perents, int *weights) {
+/// @brief Expande ciclos dentro de uma árvore de abrangência para reconstruir a árvore de abrangência original.
+/// @param graph Um ponteiro para o grafo original onde o ciclo foi identificado.
+/// @param aborescence Um ponteiro para o grafo que representa a árvore de abrangência atual, que será atualizada ao expandir o ciclo.
+/// @param cycle Um ponteiro para uma pilha contendo os vértices que formam o ciclo a ser expandido.
+/// @param n O número total de vértices no grafo.
+/// @param parents Um array que representa os pais dos vértices na árvore de abrangência; será atualizado durante a expansão do ciclo.
+/// @param weights Um array que contém os pesos das arestas na árvore de abrangência; será ajustado para refletir as mudanças após a expansão do ciclo.
+/// @return Retorna um inteiro indicando o sucesso (geralmente 0 para sucesso e -1 para falha) da operação de expansão do ciclo.
+static int expand_cycle(const Graph *graph, Graph *aborescence, Stack *cycle, int n, int *parents, int *weights) {
     int *head = stack_peek(cycle), vth, node, target;
     bool visited[n];
 
     if (head != NULL)
-        vth = perents[*head];
+        vth = parents[*head];
 
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
         const AdjList *adjList = (AdjList *) list_data(v);
@@ -67,7 +67,7 @@ static int expand_cycle(const Graph *graph, Graph *aborescence, Stack *cycle, in
     
     for (int i = 1; i < n; i++) {
         target = i;
-        node = perents[target];
+        node = parents[target];
         
         while (node != 0 && !visited[target]) {
             VertexWeight v = {.data = node, .weight = weights[node]};
@@ -92,7 +92,7 @@ static int expand_cycle(const Graph *graph, Graph *aborescence, Stack *cycle, in
 
             visited[target] = true;
             target = node;
-            node = perents[target];
+            node = parents[target];
         }
 
         visited[target] = true;
