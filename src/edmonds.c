@@ -178,9 +178,8 @@ static int find_min_parents(const Graph *graph, int *weights, int *v_min) {
 /// @param graph 
 /// @param spanning_aborescence 
 /// @return 
-static int edmonds_main(Graph *graph, Graph *spanning_aborescence) {
+static int edmonds_main(Graph *graph, Graph *spanning_aborescence, int n) {
     Stack stack;
-    int n = graph->vcount + 1;
     int weights[n], v_min[n];
 
     memset((void *) weights, 0, sizeof(int) * n);
@@ -205,7 +204,7 @@ static int edmonds_main(Graph *graph, Graph *spanning_aborescence) {
         print_graph(&contracted_graph, vertex_print);
         printf("\n=====================================\n");
 
-        edmonds_main(&contracted_graph, spanning_aborescence);
+        edmonds_main(&contracted_graph, spanning_aborescence, n);
         expand_cycle(graph, &contracted_graph, spanning_aborescence, &stack, v_min, weights);
     }
 }
@@ -217,5 +216,5 @@ void edmonds(Graph *graph, Graph *spanning_aborescence) {
     graph_init(spanning_aborescence, graph_structure_size(graph), graph->match, graph->destroy);
     print_graph(graph, vertex_print);
     printf("\n=====================================\n");
-    edmonds_main(graph, spanning_aborescence);
+    edmonds_main(graph, spanning_aborescence, graph->vcount + 1);
 }
