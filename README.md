@@ -55,26 +55,13 @@ Este script irá compilar todos os arquivos de código-fonte C e gerar um execut
 
 Para gerar um novo grafo utilizando o script Python incluído:
 
-1. Execute o seguinte comando, substituindo `100` pelo número de vértices e `500` pelo número de arestas que deseja no grafo:
+Execute o seguinte comando, substituindo `100` pelo número de vértices e `500` pelo número de arestas que deseja no grafo:
 
     ```bash
     python tools/generate_graph.py 100 500 data/graph.txt
     ```
 
 Isso criará um arquivo `graph.txt` no diretório `data` com a representação de um grafo gerado aleatoriamente.
-
-### Execução
-
-Após compilar o código e gerar o grafo, você pode executar o programa principal:
-
-1. Utilize o executável gerado pelo `run.sh`, que pode ser encontrado no diretório do projeto.
-2. Passe o arquivo de grafo como argumento, por exemplo:
-
-    ```bash
-    ./main data/graph.txt
-    ```
-
-Isso executará o algoritmo usando o grafo definido em `graph.txt` e exibirá o resultado no console.
 
 ### Limpeza
 
