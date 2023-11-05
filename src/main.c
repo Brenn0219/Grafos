@@ -43,7 +43,7 @@ int build_graph(Graph *graph, const char *path) {
 
 int main() {
     Graph graph;
-    char *path = "data/graph-test.txt";
+    char *path = "data/graph.txt";
 
     graph_init(&graph, sizeof(VertexWeight), vertex_macth, vertex_destroy);
     build_graph(&graph, path);

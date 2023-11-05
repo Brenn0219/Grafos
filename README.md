@@ -42,9 +42,9 @@ Certifique-se de que você tem o compilador `gcc` para C e o interpretador `pyth
 1. Abra um terminal na pasta do projeto.
 2. Execute o script de compilação com o seguinte comando:
 
-    ```bash
-    sh run.sh
-    ```
+```bash
+sh run.sh
+```
 
 Este script irá compilar todos os arquivos de código-fonte C e gerar um executável.
 
@@ -57,9 +57,9 @@ Para gerar um novo grafo utilizando o script Python incluído:
 
 Execute o seguinte comando, substituindo `100` pelo número de vértices e `500` pelo número de arestas que deseja no grafo:
 
-    ```bash
-    python tools/generate_graph.py 100 500 data/graph.txt
-    ```
+```bash
+python tools/generate_graph.py 100 500 data/graph.txt
+```
 
 Isso criará um arquivo `graph.txt` no diretório `data` com a representação de um grafo gerado aleatoriamente.
 
@@ -83,4 +83,4 @@ sh clean.sh
 
 ## Licença
 
-- [LICENSE](MIT License)
+- [MIT License](LICENSE)
