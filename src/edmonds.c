@@ -76,12 +76,16 @@ static int expand_cycle(const Graph *graph, Graph *spanning_aborescence, Stack *
                 if (head != NULL) {
                     if (!compare_integer((void *) &vth, (void *) &vertex_data(&v))
                         && !compare_integer((void *) head, (void *) &vertex_data(&w))) {
+                        if (!search_edge(spanning_aborescence, (void *) &v, (void *) &w)) {
+                            if (graph_insert_edge(spanning_aborescence, (void *) &v, (void *) &w) == -1)
+                                return -1;
+                        }
+                    }
+                } else {
+                    if (!search_edge(spanning_aborescence, (void *) &v, (void *) &w)) {
                         if (graph_insert_edge(spanning_aborescence, (void *) &v, (void *) &w) == -1)
                             return -1;
                     }
-                } else {
-                    if (graph_insert_edge(spanning_aborescence, (void *) &v, (void *) &w) == -1)
-                        return -1;
                 }
             }
 
