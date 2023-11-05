@@ -4,26 +4,27 @@
 #include "../include/graph.h"
 #include "../include/print_graph.h"
 
-/// @brief 
-/// @param x 
-/// @param y 
-/// @return 
-static int compare_integer(const void *x, const void* y) {
-    if (!memcmp(x, y, sizeof(int)))
+/// @brief Compara dois inteiros
+/// @param first Um ponteiro para o primeiro inteiro a ser comparado
+/// @param second Um ponteiro para o segundo inteiro a ser comparado
+/// @return Retorna 0 se os inteiros forem diferentes, ou 1 se eles forem iguais.
+static int compare_integer(const void *first, const void *second) {
+    if (!memcmp(first, second, sizeof(int)))
         return 1;
     return 0;
 }
 
-/// @brief 
-/// @param graph 
-/// @param x 
-/// @param y 
-/// @return 
-static int search_edge(const Graph *graph, const void *x, void *y) {
+/// @brief Checa se uma aresta do grafo contraído corresponde a uma aresta do grafo original e atualiza os pesos correspondentes
+/// @param graph Um ponteiro para a estrutura do grafo original
+/// @param src Um ponteiro para os dados da fonte da aresta que está sendo checada
+/// @param dest Um ponteiro para onde os dados da aresta destino serão atualizados se uma correspondência for encontrada
+/// @return Retorna um inteiro indicando se a correspondência foi encontrada e os dados foram atualizados
+static int verify_edge(const Graph *graph, const void *src, void *dest)
+ {
     AdjList *adjlist = NULL;
     
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
-        if (graph->match(((AdjList *) list_data(v))->vertex, x) == 0) {
+        if (graph->match(((AdjList *) list_data(v))->vertex, src) == 0) {
             adjlist = (AdjList *) list_data(v);
             break;
         }
@@ -33,8 +34,8 @@ static int search_edge(const Graph *graph, const void *x, void *y) {
         return 0;
     
     for (Cell *w = list_head(adjlist->adjacent); w != NULL; w = list_next(w)) {
-        if (graph->match(list_data(w), y) == 0) {
-            ((VertexWeight *) y)->weight = vertex_weight(list_data(w));
+        if (graph->match(list_data(w), dest) == 0) {
+            ((VertexWeight *) dest)->weight = vertex_weight(list_data(w));
             return 1;
         }
     }
@@ -44,13 +45,13 @@ static int search_edge(const Graph *graph, const void *x, void *y) {
 
 /// @brief 
 /// @param graph 
-/// @param spanning_aborescence 
+/// @param aborescence 
 /// @param cycle 
 /// @param n 
 /// @param perents 
 /// @param weights 
 /// @return 
-static int expand_cycle(const Graph *graph, Graph *spanning_aborescence, Stack *cycle, int n, int *perents, int *weights) {
+static int expand_cycle(const Graph *graph, Graph *aborescence, Stack *cycle, int n, int *perents, int *weights) {
     int *head = stack_peek(cycle), vth, node, target;
     bool visited[n];
 
@@ -60,7 +61,7 @@ static int expand_cycle(const Graph *graph, Graph *spanning_aborescence, Stack *
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
         const AdjList *adjList = (AdjList *) list_data(v);
 
-        if (graph_insert_vertex(spanning_aborescence, adjList->vertex) == -1)
+        if (graph_insert_vertex(aborescence, adjList->vertex) == -1)
             return -1;
     }
     
@@ -72,18 +73,18 @@ static int expand_cycle(const Graph *graph, Graph *spanning_aborescence, Stack *
             VertexWeight v = {.data = node, .weight = weights[node]};
             VertexWeight w = {.data = target, .weight = weights[target]};
 
-            if (search_edge(graph, (void *) &v, (void *) &w)) {
+            if (verify_edge(graph, (void *) &v, (void *) &w)) {
                 if (head != NULL) {
                     if (!compare_integer((void *) &vth, (void *) &vertex_data(&v))
                         && !compare_integer((void *) head, (void *) &vertex_data(&w))) {
-                        if (!search_edge(spanning_aborescence, (void *) &v, (void *) &w)) {
-                            if (graph_insert_edge(spanning_aborescence, (void *) &v, (void *) &w) == -1)
+                        if (!verify_edge(aborescence, (void *) &v, (void *) &w)) {
+                            if (graph_insert_edge(aborescence, (void *) &v, (void *) &w) == -1)
                                 return -1;
                         }
                     }
                 } else {
-                    if (!search_edge(spanning_aborescence, (void *) &v, (void *) &w)) {
-                        if (graph_insert_edge(spanning_aborescence, (void *) &v, (void *) &w) == -1)
+                    if (!verify_edge(aborescence, (void *) &v, (void *) &w)) {
+                        if (graph_insert_edge(aborescence, (void *) &v, (void *) &w) == -1)
                             return -1;
                     }
                 }
@@ -98,11 +99,13 @@ static int expand_cycle(const Graph *graph, Graph *spanning_aborescence, Stack *
     }
 }
 
-/// @brief 
-/// @param graph 
-/// @param stack 
-/// @return 
-static int contract_cycle(const Graph *graph, Graph *contracted_graph, Stack *cycle, const int *weights) {
+/// @brief Contrai um ciclo no grafo, criando um novo grafo onde o ciclo é representado por um único nó
+/// @param graph Um ponteiro para a estrutura do grafo original no qual o ciclo foi detectado
+/// @param contracted_graph Um ponteiro para a estrutura do grafo onde o grafo com o ciclo contraído será armazenado
+/// @param cycle Uma pilha contendo os vértices que formam o ciclo a ser contraído
+/// @param weights Um ponteiro para um vetor de pesos associados às arestas do grafo original
+/// @return Retorna um inteiro que normalmente indica sucesso ou falha na operação de contração do ciclo
+static int contract_cycle(const Graph *graph, Graph *contracted, Stack *cycle, const int *weights) {
     int contracted_vertex = vertex_data(stack_peek(cycle));
 
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
@@ -124,13 +127,13 @@ static int contract_cycle(const Graph *graph, Graph *contracted_graph, Stack *cy
                     p.weight = p.weight - weights[vertex_data(w)];
                 }
 
-                if (graph_insert_vertex(contracted_graph, (void *) &u) == -1)
+                if (graph_insert_vertex(contracted, (void *) &u) == -1)
                     return -1;
 
-                if (graph_insert_vertex(contracted_graph, (void *) &p) == -1)
+                if (graph_insert_vertex(contracted, (void *) &p) == -1)
                     return -1;
 
-                if (graph_insert_edge(contracted_graph, (void *) &u, (void *) &p) == -1)
+                if (graph_insert_edge(contracted, (void *) &u, (void *) &p) == -1)
                     return -1;
             }
         }
@@ -139,12 +142,12 @@ static int contract_cycle(const Graph *graph, Graph *contracted_graph, Stack *cy
     return 0;
 }
 
-/// @brief 
-/// @param parents 
-/// @param index 
-/// @param stack 
-/// @return 
-static int cycle(const int* parents, const int index, Stack *stack) {
+/// @brief Detecta um ciclo no grafo a partir de um dado índice
+/// @param parents Um ponteiro para um vetor de inteiros que representa os predecessores de cada vértice no grafo
+/// @param index O índice do vértice a partir do qual a busca por um ciclo começa
+/// @param cycle Um ponteiro para uma estrutura de pilha onde os vértices que formam o ciclo serão armazenados
+/// @return Retorna um inteiro que normalmente indica se um ciclo foi encontrado ou alguma outra condição definida pelo implementador
+static int cycle(const int* parents, const int index, Stack *cycle) {
     Stack aux;
     int father;
 
@@ -155,11 +158,11 @@ static int cycle(const int* parents, const int index, Stack *stack) {
     while (father != 0) {
         if (stack_search(&aux, (void *) &father)) {
             while (!compare_integer(&father, stack_peek(&aux))) {
-                stack_push(stack, stack_peek(&aux));
+                stack_push(cycle, stack_peek(&aux));
                 stack_pop(&aux);
             }
 
-            stack_push(stack, &father);
+            stack_push(cycle, &father);
 
             return 1;
         } else {
@@ -171,11 +174,11 @@ static int cycle(const int* parents, const int index, Stack *stack) {
     return 0;
 }
 
-/// @brief 
-/// @param n 
-/// @param parents 
-/// @param stack 
-/// @return 
+/// @brief Descobre ciclo no grafo com base nos predecessores
+/// @param n O número de vértices no grafo
+/// @param parents Um ponteiro para um vetor de inteiros contendo os predecessores de cada vértice
+/// @param stack Um ponteiro para uma estrutura de pilha utilizada para armazenar os vértices do ciclo descoberto
+/// @return Retorna um inteiro que pode indicar a presença de um ciclo ou alguma outra condição definida pelo implementador
 static int discover_cycle(const int n, const int* parents, Stack *stack) {
     int retval = 0;
     stack_init(stack, sizeof(int), compare_integer, NULL);
@@ -190,10 +193,10 @@ static int discover_cycle(const int n, const int* parents, Stack *stack) {
     return retval; 
 }
 
-/// @brief 
-/// @param graph 
-/// @param weights 
-/// @param v_min 
+/// @brief Encontra os predecessores de peso mínimo para cada vértice
+/// @param graph Um ponteiro para a estrutura do grafo no qual o algoritmo opera
+/// @param weights Um ponteiro para um vetor de inteiros onde os pesos mínimos de entrada serão armazenados
+/// @param v_min Um ponteiro para um vetor de inteiros onde os índices dos predecessores de peso mínimo serão armazenados
 static void find_min_parents(const Graph *graph, int *weights, int *v_min) {
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
         const AdjList *adjlist = (AdjList *) list_data(v);
@@ -214,12 +217,12 @@ static void find_min_parents(const Graph *graph, int *weights, int *v_min) {
     }
 }
 
-/// @brief 
-/// @param graph 
-/// @param spanning_aborescence 
-/// @param contracted 
-/// @param n 
-static void edmonds_main(const Graph *graph, Graph *spanning_aborescence, Graph *contracted, const int n) {
+/// @brief Método principal de Edmonds, recursivo
+/// @param graph Um ponteiro para a estrutura do grafo no qual o algoritmo opera
+/// @param aborescence Um ponteiro para a estrutura do grafo onde a arborescência de extensão mínima será armazenada
+/// @param contracted Um ponteiro para a estrutura do grafo que contém os vértices e arestas contratados durante o processo recursivo
+/// @param n O tamanho (número de vértices) do grafo original (graph)
+static void edmonds_main(const Graph *graph, Graph *aborescence, Graph *contracted, const int n) {
     Stack stack;
     int weights[n], v_min[n];
 
@@ -234,23 +237,20 @@ static void edmonds_main(const Graph *graph, Graph *spanning_aborescence, Graph 
         graph_init(&new_graph, graph_structure_size(graph), graph->match, graph->destroy);
 
         contract_cycle(contracted, &new_graph, &stack, weights);
-        edmonds_main(graph, spanning_aborescence, &new_graph, n);
+        edmonds_main(graph, aborescence, &new_graph, n);
     }
 
-    expand_cycle(graph, spanning_aborescence, &stack, n, v_min, weights);
+    expand_cycle(graph, aborescence, &stack, n, v_min, weights);
 }
 
-/// @brief 
-/// @param graph 
-/// @param spanning_aborescence 
-void edmonds(Graph *graph, Graph *spanning_aborescence) {    
-    graph_init(spanning_aborescence, graph_structure_size(graph), graph->match, graph->destroy);
-    edmonds_main(graph, spanning_aborescence, graph, graph->vcount + 1);
+void edmonds(Graph *graph, Graph *aborescence) {    
+    graph_init(aborescence, graph_structure_size(graph), graph->match, graph->destroy);
+    edmonds_main(graph, aborescence, graph, graph->vcount + 1);
     
     printf("G\n");
     print_graph(graph, vertex_print);
     printf("\n=====================================\n");
 
     printf("AGM\n");
-    print_graph(spanning_aborescence, vertex_print);
+    print_graph(aborescence, vertex_print);
 }
