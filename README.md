@@ -1,29 +1,99 @@
+# Grafos
 
-# Lista Adjacente
-A estrutura utilizada nesse trabalho prático foi a Lista Adjancente na linguagem de programação C. 
+Este projeto implementa uma estrutura de dados de grafo utilizando listas de adjacência na linguagem de programação C. A estrutura é genérica e pode ser utilizada para representar grafos direcionados ou não direcionados. Além disso, o projeto inclui uma série de interfaces para manipulação de pilhas, vértices e visualização de grafos.
 
-## Propriedades
-* Um grafo G pode ser representado por diferentes listas de adjacência pois os
-elementos podem aparecer em qualquer ordem nas listas
+## Sobre Grafos
 
-* A consulta é mais cara para se determinar a existência de arco incidente a um
-vértice – tempo linear no número de vértices, isto é, O(n) para grafo denso
+Grafos são estruturas de dados que modelam a relação entre pares de objetos. Cada objeto é chamado de vértice e a relação entre eles é chamada de aresta. Grafos são utilizados em diversas áreas da ciência da computação, como redes de computadores, análise de redes sociais, algoritmos de roteamento e muito mais.
 
-* Ela ocupa um espaço proporcional a O(n + m)
+## Estrutura de Dados
 
-## Descrição
-O `vetor de listas de adjacência` de um grafo tem uma **lista encadeada** (= *linked list*) associada com cada vértice do grafo.  A lista associada com um vértice v contém todos os vizinhos de v.  Portanto, a lista do vértice v representa o leque de saída de v. 
+A representação do grafo é feita através de um vetor de listas de adjacência, onde cada lista encadeada está associada a um vértice do grafo e contém todos os seus vizinhos. Esta representação é eficiente em termos de espaço, ocupando O(n + m) onde n é o número de vértices e m é o número de arestas.
 
-### Sucessores e Predecessores 
-* Sucessores: Os sucessores de um vértice em um grafo são os vértices para os quais existe uma aresta que sai do vértice de origem e chega ao vértice de destino. Em termos simples, são os vértices que podem ser alcançados a partir de um determinado vértice seguindo as arestas do grafo.
+### Propriedades da Lista de Adjacência
 
-* Predecessores: Os predecessores de um vértice em um grafo são os vértices que têm uma aresta que sai deles e chega ao vértice em questão. Em outras palavras, são os vértices dos quais é possível alcançar o vértice em questão seguindo as arestas do grafo.
+- A representação do grafo não é única, pois as listas podem variar na ordem dos elementos.
+- Determinar a existência de uma aresta incidente a um vértice tem custo O(n) para grafos densos.
+- Espaço ocupado é proporcional a O(n + m).
 
-### Busca em Profundidade
-O algoritmo de busca é qualquer algoritmo que visita todos os vértices de um grafo andando pelos arcos de um vértice a outro. `Busca em profundidade` (= *depth-first search*) ou `busca DFS`. O objetivo é visitar todos os vértices e numerá-los na ordem em que são descobertos. Esse algoritmo foi numerá-los na ordem lexográfica.
+## Utilização
 
-## Referência 
-* https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/graphdatastructs.html
-* https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/dfs.html
-* https://www.ic.unicamp.br/~zanoni/teaching/mo417/2011-2s/aulas/handout/10-grafos-buscas.pdf
-* https://everythingcomputerscience.com/books/Mastering-Algorithms-with-C-Loudon.pdf
+O código é genérico e utiliza interfaces como `stack`, `vertex`, e `print_graph` para manipulação do grafo.
+
+### Interface Vertex
+
+A interface `vertex` é flexível e adaptável para acomodar diferentes tipos de dados de vértices em um grafo. 
+
+#### Funcionalidades Básicas:
+
+- `vertex_print`: Imprime os detalhes de um vértice.
+- `vertex_match`: Compara dois vértices para checar se são idênticos.
+- `vertex_comparison_weights`: Avalia os pesos de dois vértices, útil em grafos ponderados.
+- `vertex_destroy`: Libera a memória alocada para um vértice.
+
+## Executando o Código
+
+### Pré-requisitos
+
+Certifique-se de que você tem o compilador `gcc` para C e o interpretador `python` instalados em seu sistema.
+
+### Compilação
+
+1. Abra um terminal na pasta do projeto.
+2. Execute o script de compilação com o seguinte comando:
+
+    ```bash
+    sh run.sh
+    ```
+
+Este script irá compilar todos os arquivos de código-fonte C e gerar um executável.
+
+> **Observação para usuários de Linux/Mac:** Ao executar o script `run.sh`, utilize `./run` em vez de `./run.exe`.
+
+
+### Gerando o Grafo com Script Python
+
+Para gerar um novo grafo utilizando o script Python incluído:
+
+1. Execute o seguinte comando, substituindo `100` pelo número de vértices e `500` pelo número de arestas que deseja no grafo:
+
+    ```bash
+    python tools/generate_graph.py 100 500 data/graph.txt
+    ```
+
+Isso criará um arquivo `graph.txt` no diretório `data` com a representação de um grafo gerado aleatoriamente.
+
+### Execução
+
+Após compilar o código e gerar o grafo, você pode executar o programa principal:
+
+1. Utilize o executável gerado pelo `run.sh`, que pode ser encontrado no diretório do projeto.
+2. Passe o arquivo de grafo como argumento, por exemplo:
+
+    ```bash
+    ./main data/graph.txt
+    ```
+
+Isso executará o algoritmo usando o grafo definido em `graph.txt` e exibirá o resultado no console.
+
+### Limpeza
+
+Para remover os arquivos compilados e limpar o diretório de trabalho, você pode usar:
+
+```bash
+sh clean.sh
+```
+
+## Referências
+
+- [Algoritmos para Grafos em C (Graph Data Structures)](https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/graphdatastructs.html)
+- [Algoritmos para Grafos em C (Depth-first Search)](https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/dfs.html)
+- [Buscas em Grafos - IC Unicamp](https://www.ic.unicamp.br/~zanoni/teaching/mo417/2011-2s/aulas/handout/10-grafos-buscas.pdf)
+- [Mastering Algorithms with C - Loudon](https://everythingcomputerscience.com/books/Mastering-Algorithms-with-C-Loudon.pdf)
+- [Edmonds' Algorithm - Wikipedia](https://en.wikipedia.org/wiki/Edmonds%27_algorithm)
+- [Chu-Liu/Edmonds' Algorithm Implementation](https://github.com/danieldk/chu-liu-edmonds/blob/main/src/lib.rs)
+- [CSE490U - Slides on Chu-Liu/Edmonds' Algorithm](https://courses.cs.washington.edu/courses/cse490u/17wi/slides/CLE.pdf)
+
+## Licença
+
+- [LICENSE](MIT License)
