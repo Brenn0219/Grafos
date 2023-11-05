@@ -48,8 +48,15 @@ int main() {
     graph_init(&graph, sizeof(VertexWeight), vertex_macth, vertex_destroy);
     build_graph(&graph, path);
     
-    Graph *spanning_aborescence = (Graph *) malloc(sizeof(Graph));
-    edmonds(&graph, spanning_aborescence);
+    Graph *aborescence = (Graph *) malloc(sizeof(Graph));
+    edmonds(&graph, aborescence);
+
+    printf("G\n");
+    print_graph(&graph, vertex_print);
+    printf("\n=====================================\n");
+
+    printf("AGM\n");
+    print_graph(aborescence, vertex_print);
     
     graph_destroy(&graph);
     

@@ -246,11 +246,4 @@ static void edmonds_main(const Graph *graph, Graph *aborescence, Graph *contract
 void edmonds(Graph *graph, Graph *aborescence) {    
     graph_init(aborescence, graph_structure_size(graph), graph->match, graph->destroy);
     edmonds_main(graph, aborescence, graph, graph->vcount + 1);
-    
-    printf("G\n");
-    print_graph(graph, vertex_print);
-    printf("\n=====================================\n");
-
-    printf("AGM\n");
-    print_graph(aborescence, vertex_print);
 }

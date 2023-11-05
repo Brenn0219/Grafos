@@ -18,10 +18,10 @@ int stack_push(Stack *stack, const void *data);
 /// @return 0 se a insercao do elemento for bem sucedidade ou -1 caso contrario.
 int stack_pop(Stack *stack);
 
-/// @brief 
-/// @param stack 
-/// @param data 
-/// @return 
+/// @brief Procura um elemento na pilha.
+/// @param stack Um ponteiro para a pilha onde a busca será realizada.
+/// @param data Um ponteiro para os dados que estão sendo procurados na pilha.
+/// @return Retorna 1 se o elemento for encontrado, e 0 caso contrário.
 int stack_search(Stack *stack, const void *data);
 
 /// @brief The stack_init operation initializes a stack so that it can be used in other operations . Since a stack is a linked list and requires the same initialization, stack_init is defined to list_init . The runtime complexity of stack_init is the same as list_init , or O (1).
