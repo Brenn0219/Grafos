@@ -6,7 +6,7 @@
 #include  "../include/stack.h"
 #include "../include/print_graph.h"
 #include "../include/dfs.h"
-#include "../include/edmonds.h"
+#include "../include/chu_liu_edmonds.h"
 
 /// @brief Constroi um grafo ralicionando os vertive v e w. A construcao e feita aparti de uma leitura de um arquivo passando o caminho na variavel path. O arquivo tem que contar o total de vertice, total de aresta, seus relacionamentos e por fim o grafico ja tem que esta inicializado com a funcao graph_init. Complexidade - O(V+E)
 /// @param graph ponteiro para um grafo
@@ -49,7 +49,7 @@ int main() {
     build_graph(&graph, path);
     
     Graph *aborescence = (Graph *) malloc(sizeof(Graph));
-    edmonds(&graph, aborescence);
+    chu_liu_edmonds(&graph, aborescence);
 
     printf("G\n");
     print_graph(&graph, vertex_print);
