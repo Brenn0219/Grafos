@@ -51,8 +51,8 @@ static int verify_edge(const Graph *graph, const void *src, void *dest)
 /// @param parents Um array que representa os pais dos vértices na árvore de abrangência; será atualizado durante a expansão do ciclo.
 /// @param weights Um array que contém os pesos das arestas na árvore de abrangência; será ajustado para refletir as mudanças após a expansão do ciclo.
 /// @return Retorna um inteiro indicando o sucesso (geralmente 0 para sucesso e -1 para falha) da operação de expansão do ciclo.
-static int expand_cycle(const Graph *graph, Graph *aborescence, Stack *cycle, int n, int *parents, int *weights) {
-    int *head = stack_peek(cycle), vth, node, target;
+static int expand_cycle(const Graph *graph, Graph *aborescence, Stack *cycle, int *parents, int *weights) {
+    int *head = stack_peek(cycle), vth, node, target, n = graph->vcount + 1;
     bool visited[n];
 
     if (head != NULL)
@@ -222,8 +222,9 @@ static void find_min_parents(const Graph *graph, int *weights, int *v_min) {
 /// @param aborescence Um ponteiro para a estrutura do grafo onde a arborescência de extensão mínima será armazenada
 /// @param contracted Um ponteiro para a estrutura do grafo que contém os vértices e arestas contratados durante o processo recursivo
 /// @param n O tamanho (número de vértices) do grafo original (graph)
-static void edmonds(const Graph *graph, Graph *aborescence, Graph *contracted, const int n) {
+static void edmonds(const Graph *graph, Graph *aborescence, Graph *contracted) {
     Stack stack;
+    int n = graph->vcount + 1;
     int weights[n], v_min[n];
 
     memset((void *) weights, 0, sizeof(int) * n);
@@ -237,13 +238,13 @@ static void edmonds(const Graph *graph, Graph *aborescence, Graph *contracted, c
         graph_init(&new_graph, graph_structure_size(graph), graph->match, graph->destroy);
 
         contract_cycle(contracted, &new_graph, &stack, weights);
-        edmonds(graph, aborescence, &new_graph, n);
+        edmonds(graph, aborescence, &new_graph);
     }
 
-    expand_cycle(graph, aborescence, &stack, n, v_min, weights);
+    expand_cycle(graph, aborescence, &stack, v_min, weights);
 }
 
 void chu_liu_edmonds(Graph *graph, Graph *aborescence) {    
     graph_init(aborescence, graph_structure_size(graph), graph->match, graph->destroy);
-    edmonds(graph, aborescence, graph, graph->vcount + 1);
+    edmonds(graph, aborescence, graph);
 }
