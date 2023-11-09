@@ -1,7 +1,7 @@
 #pragma once
 
 typedef struct Vertex {
-    int vertice;
+    int data;
 } Vertex;
 
 typedef struct VertexWeight  {
