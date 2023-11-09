@@ -16,5 +16,5 @@ int queue_dequeue(Queue *queue);
 
 #define queue_init list_init
 #define queue_destroy list_destroy
-#define queue_peek(queue) ((queue)-> heah == NULL ? NULL : (queue)->head->data)
+#define queue_peek(queue) ((queue)-> head == NULL ? NULL : (queue)->head->data)
 #define queue_size list_size
