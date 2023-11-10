@@ -42,8 +42,11 @@ int main() {
 
     graph_init(&graph, sizeof(VertexWeight), vertex_macth, vertex_destroy);
     build_graph(&graph, path);
-    
-    dinic(&graph);
+
+    const void *src = ((AdjList *) list_data(list_head(graph.adjlists)))->vertex;
+    const void *dest = ((AdjList *) list_data(list_tail(graph.adjlists)))->vertex;
+
+    dinic(&graph, src, dest);
 
     graph_destroy(&graph);
     

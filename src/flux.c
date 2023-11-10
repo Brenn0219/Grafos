@@ -4,13 +4,13 @@
 int build_residual_graph(const Graph *graph, Graph *residual) {
     for (Cell *v = list_head(graph->adjlists); v != NULL; v = list_next(v)) {
         const AdjList *adjlist = (AdjList *) list_data(v);
-        FlowVertex src = {.data = vertex_data(adjlist->vertex), .capacity = 0, .flux = 0};
+        FlowVertex src = {.data = vertex_data(adjlist->vertex), .flux = 0, .capacity = vertex_weight(adjlist->vertex)};
 
         if (graph_insert_vertex(residual, (void *) &src) == -1)
             return -1;
 
         for (Cell *w = list_head(adjlist->adjacent); w != NULL; w = list_next(w)) {
-            FlowVertex dist = {.data = vertex_data(list_data(w)), .capacity = vertex_weight(list_data(w)), .flux = 0};
+            FlowVertex dist = {.data = vertex_data(list_data(w)), .flux = 0, .capacity = vertex_weight(list_data(w))};
 
             if (graph_insert_vertex(residual, (void *) &dist) == -1)
                 return -1;

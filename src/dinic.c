@@ -81,19 +81,26 @@ static int tiered_network(const Graph *residual, const void *start, Graph *layer
     }
 }
 
-void dinic_main(const Graph *graph, Graph *residual) {
+void dinic_main(const Graph *graph, Graph *residual, AdjList *src, AdjList *dest) {
     Graph layered;
-    const FlowVertex *fv = (FlowVertex *) ((AdjList *) list_data(list_head(residual->adjlists)))->vertex;
+    Stack path;
 
     graph_init(&layered, graph_structure_size(residual), residual->match, residual->destroy);
-    tiered_network(residual, (void *) fv, &layered);
+    tiered_network(residual, src->vertex, &layered);
+    
+    stack_init(&path, graph_structure_size(&layered), layered.match, layered.destroy);
+    increasing_path(&layered, &path, src, dest);
 }
 
-void dinic(Graph *graph) {
+void dinic(const Graph *graph, const void* home, const void* target) {
     Graph residual;
 
     graph_init(&residual, sizeof(FlowVertex), match_residual, vertex_destroy);
     build_residual_graph(graph, &residual);
 
-    dinic_main(graph, &residual);
+    AdjList *src, *dest;
+    graph_adjlist(&residual, home, &src);
+    graph_adjlist(&residual, target, &dest);
+
+    dinic_main(graph, &residual, src, dest);
 }
